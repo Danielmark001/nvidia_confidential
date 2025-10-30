@@ -125,7 +125,7 @@ st.markdown("""
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 100% !important;
-        max-width: 1000px !important;
+        max-width: 750px !important;
         background-color: white !important;
         z-index: 1000 !important;
         padding: 1.5rem 2rem 2rem 2rem !important;
@@ -157,7 +157,7 @@ st.markdown("""
         bottom: 2rem !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        margin-left: 420px !important;
+        margin-left: 315px !important;
         z-index: 1001 !important;
     }
 
