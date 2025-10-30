@@ -28,7 +28,7 @@ def get_secret(key: str, default: str = "") -> str:
 st.set_page_config(
     page_title="Medication Advisor AI - Updated",
     page_icon="💊",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="expanded"
 )
 
@@ -42,6 +42,15 @@ st.markdown("""
     .main {
         max-width: 900px;
         margin: 0 auto;
+    }
+
+    [data-testid="stSidebar"] {
+        min-width: 350px !important;
+        max-width: 350px !important;
+    }
+
+    [data-testid="stSidebar"] > div:first-child {
+        width: 350px !important;
     }
 
     .main-header {
@@ -280,139 +289,25 @@ with main_col:
     # Input section - always visible
     st.divider()
 
-    # Voice settings - show first
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        if st.session_state.voice_enabled:
-            audio_file = st.file_uploader(
-                "Upload audio file",
-                type=["wav", "mp3", "ogg", "m4a", "webm"],
-                key="audio_uploader",
-                help="Upload an audio file to transcribe and ask (ElevenLabs)"
-            )
-        else:
-            audio_file = None
-            st.info("Upload audio: ElevenLabs API not configured")
-    with col2:
-        if st.session_state.voice_enabled:
-            enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs")
-        else:
-            enable_tts = False
+    # Upload audio file
+    if st.session_state.voice_enabled:
+        audio_file = st.file_uploader(
+            "Upload audio file",
+            type=["wav", "mp3", "ogg", "m4a", "webm"],
+            key="audio_uploader",
+            help="Upload an audio file to transcribe and ask (ElevenLabs)"
+        )
+    else:
+        audio_file = None
+        st.info("Upload audio: ElevenLabs API not configured")
 
-    # Speech input button (works with browser, no API needed)
-    st.markdown("""
-<style>
-    .speech-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 0.6rem 1.2rem !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3) !important;
-        transition: all 0.3s ease !important;
-        display: inline-block;
-        margin: 0.5rem 0;
-    }
+    # Voice reply checkbox
+    if st.session_state.voice_enabled:
+        enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs")
+    else:
+        enable_tts = False
 
-    .speech-btn:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4) !important;
-    }
-
-    .speech-btn:active {
-        transform: translateY(0) !important;
-    }
-
-    .speech-btn.listening {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
-        box-shadow: 0 4px 6px rgba(17, 153, 142, 0.3) !important;
-        animation: pulse 1.5s infinite !important;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.8; }
-    }
-</style>
-
-<button id="speech-btn" class="speech-btn" onclick="window.startSpeech()">
-    🎤 Speak
-</button>
-
-<script>
-function initSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-        console.error('Speech Recognition not supported in this browser');
-        return;
-    }
-
-    window.recognition = new SpeechRecognition();
-    window.recognition.continuous = false;
-    window.recognition.interimResults = false;
-    window.recognition.lang = 'en-US';
-
-    window.startSpeech = function() {
-        const btn = document.getElementById('speech-btn');
-        btn.classList.add('listening');
-        btn.textContent = '🎤 Listening...';
-
-        window.recognition.start();
-    };
-
-    window.recognition.onresult = function(event) {
-        const btn = document.getElementById('speech-btn');
-        btn.classList.remove('listening');
-        btn.textContent = '🎤 Speak';
-
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) {
-                transcript += event.results[i][0].transcript;
-            }
-        }
-
-        if (transcript) {
-            const inputs = document.querySelectorAll('input[type="text"]');
-            const chatInput = Array.from(inputs).find(input =>
-                input.placeholder && input.placeholder.includes('medications')
-            );
-
-            if (chatInput) {
-                chatInput.value = transcript;
-                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-                chatInput.dispatchEvent(new Event('change', { bubbles: true }));
-                setTimeout(() => chatInput.focus(), 100);
-            }
-        }
-    };
-
-    window.recognition.onerror = function(event) {
-        const btn = document.getElementById('speech-btn');
-        btn.classList.remove('listening');
-        btn.textContent = '🎤 Speak';
-        console.error('Speech recognition error:', event.error);
-    };
-
-    window.recognition.onend = function() {
-        const btn = document.getElementById('speech-btn');
-        btn.classList.remove('listening');
-        btn.textContent = '🎤 Speak';
-    };
-}
-
-document.addEventListener('DOMContentLoaded', initSpeechRecognition);
-if (document.readyState !== 'loading') {
-    initSpeechRecognition();
-}
-</script>
-""", unsafe_allow_html=True)
-
-    # Text input - below speak button
+    # Text input
     user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
@@ -513,61 +408,59 @@ if (document.readyState !== 'loading') {
 
                     # Adjust system prompt based on response style
                     if response_style == "Detailed (Structured)":
-                        system_prompt = """You are an expert medical information assistant specializing in medication guidance.
+                        system_prompt = """You are an expert medical information assistant who explains medication information in a natural, conversational way.
 
-CRITICAL RULES FOR HIGH ACCURACY (Target F1≥0.80, Citation Precision≥0.90):
+CRITICAL RULES:
 1. ONLY use information explicitly stated in the Knowledge Graph Data provided
 2. NEVER infer, assume, or add information not present in the data
-3. ALWAYS quote or paraphrase directly from the descriptions and indications
-4. CITE the medication name you're referencing (e.g., "According to the data for [MedicationName]...")
-5. If information is not in the data, state: "This information is not available in the knowledge graph"
+3. Explain naturally as if talking to a patient, but stay factual
+4. Make connections between different aspects of the medication when the data supports it
+5. If information is not in the data, simply say you don't have that information
+6. Do not use bold text, asterisks, or any markdown formatting
+7. Do not create rigid sections with labels like "Medication:", "Citation:", or "Disclaimer:"
+8. Weave the information together in a flowing explanation
 
-Your role:
-1. Extract and present facts directly from the knowledge graph
-2. Use the exact terminology from the descriptions when possible
-3. Explain mechanisms, indications, and classifications clearly
-4. Add patient-friendly explanations in parentheses for medical terms
-5. Structure answers with clear sections
-
-Response structure (NO BOLD OR MARKDOWN FORMATTING):
-- Medication: State the medication name from the data
-- Primary Information: Quote/paraphrase key facts from description and indication
-- Additional Details: Include mechanism or classification if available
-- Citation: Source: Knowledge Graph - [MedicationName]
-- Disclaimer: Note: This information is from the knowledge graph. Consult your healthcare provider for personalized medical advice.
+Your approach:
+- Start by directly addressing what the medication is and does
+- Explain how it works if that information is in the data
+- Connect different pieces of information naturally (e.g., how the mechanism relates to what it treats)
+- Use patient-friendly language, explaining medical terms naturally in context
+- End with a brief note that this is informational and they should consult their healthcare provider
 
 Quality targets:
-- F1-score ≥0.80 (match gold answers closely)
-- Citation precision ≥0.90 (only cite valid knowledge graph nodes)
-- Zero hallucination (no made-up facts)"""
+- Zero hallucination (only use provided data)
+- Natural, flowing explanations
+- Clear connections between related concepts"""
 
                     elif response_style == "Concise (Brief)":
-                        system_prompt = """You are a medication information assistant.
+                        system_prompt = """You are a medication information assistant who gives brief, natural explanations.
 
 Guidelines:
-- Provide brief, direct answers based on the knowledge graph data
+- Provide short, conversational answers based on the knowledge graph data
 - Use 2-3 sentences maximum
-- Focus on the most important information only
-- Avoid lengthy explanations unless specifically asked
-- Still mention it's informational, not medical advice
-- Do not use bold text, asterisks, or markdown formatting"""
+- Explain the key point naturally without rigid structure
+- Only use information from the provided data
+- Keep it simple and patient-friendly
+- Do not use bold text, asterisks, or markdown formatting
+- End with a brief reminder to consult a healthcare provider"""
 
                     else:
-                        system_prompt = """You are an expert clinical pharmacologist providing technical medication information.
+                        system_prompt = """You are an expert clinical pharmacologist who explains medication information conversationally but with technical precision.
 
 Guidelines:
-- Use precise medical and pharmacological terminology
-- Cite specific mechanisms, pathways, and drug classes
-- Include relevant pharmacokinetics/pharmacodynamics when available
-- Assume audience has medical background
-- Reference the knowledge graph data with clinical accuracy
-- Include appropriate clinical caveats
-- Do not use bold text, asterisks, or markdown formatting"""
+- Use precise medical and pharmacological terminology naturally in context
+- Explain mechanisms, pathways, and drug classes in a flowing narrative
+- Connect pharmacokinetic and pharmacodynamic information when discussing how medications work
+- Reference the knowledge graph data accurately but weave it into natural explanations
+- Assume audience has medical background but still make logical connections clear
+- Include clinical considerations naturally in the explanation
+- Do not use bold text, asterisks, or markdown formatting
+- Do not create rigid sections or labels"""
 
                     few_shot = """EXAMPLE:
 KG Data: "Metformin - Description: Biguanide that decreases hepatic glucose production. Indication: Type 2 diabetes mellitus."
 Question: "What is Metformin used for?"
-Answer: "Metformin is indicated for type 2 diabetes mellitus. It decreases hepatic glucose production and improves glycemic control. Source: Knowledge Graph - Metformin"
+Answer: "Metformin is used to treat type 2 diabetes mellitus. It works by decreasing the amount of glucose your liver produces, which helps improve blood sugar control. As a biguanide medication, it's particularly effective for managing glycemic levels in diabetic patients. Remember to consult your healthcare provider for personalized advice about this medication."
 
 ---"""
 
