@@ -101,14 +101,26 @@ st.markdown("""
         border-radius: 8px;
     }
 
+    .main > div:last-child {
+        padding-bottom: 100px;
+    }
+
     [data-testid="stChatInput"] {
-        position: sticky;
-        bottom: 0;
-        background-color: white;
-        z-index: 100;
-        padding: 1rem;
-        border-top: 1px solid #ddd;
-        margin-top: 1rem;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background-color: white !important;
+        z-index: 1000 !important;
+        padding: 1rem !important;
+        border-top: 2px solid #e0e0e0 !important;
+        margin: 0 !important;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    [data-testid="stChatInput"] > div {
+        max-width: 900px !important;
+        margin: 0 auto !important;
     }
 
     [data-testid="stChatInput"] input {
