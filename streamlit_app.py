@@ -218,6 +218,9 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
+    # Input section
+    st.divider()
+
     # Voice input section
     if st.session_state.voice_enabled:
         with st.container():
@@ -237,8 +240,8 @@ with main_col:
         audio_file = None
         enable_tts = False
 
-    # Text input
-    user_input = st.chat_input("Ask about medications...", key="text_input")
+    # Text input - prominently displayed
+    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
