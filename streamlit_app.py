@@ -38,48 +38,83 @@ st.markdown("""
     .main-header {
         text-align: center;
         padding: 1rem 0 2rem 0;
-        border-bottom: 2px solid #f0f2f6;
+        border-bottom: 2px solid #e8eef7;
         margin-bottom: 2rem;
+    }
+
+    .main-header h1 {
+        color: #1f77b4;
+        margin-bottom: 0.5rem;
     }
 
     .status-badge {
         display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 500;
         margin: 0.25rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .status-success {
         background-color: #d4edda;
         color: #155724;
+        border: 1px solid #c3e6cb;
     }
 
     .status-error {
         background-color: #f8d7da;
         color: #721c24;
+        border: 1px solid #f5c6cb;
     }
 
     .info-box {
-        background-color: #f8f9fa;
-        border-left: 4px solid #0066cc;
+        background: linear-gradient(135deg, #f0f4ff 0%, #f8fbff 100%);
+        border-left: 4px solid #1f77b4;
+        border-radius: 8px;
         padding: 1rem;
-        border-radius: 4px;
         margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(31, 119, 180, 0.08);
     }
 
     [data-testid="stChatMessageContent"] {
         padding: 1rem;
+        border-radius: 8px;
     }
 
     [data-testid="stChatInput"] {
         position: sticky;
         bottom: 0;
-        background: white;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
         z-index: 100;
-        padding: 1rem 0;
-        border-top: 1px solid #e0e0e0;
+        padding: 1.5rem;
+        border-top: 2px solid #1f77b4;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 -4px 12px rgba(31, 119, 180, 0.15);
+        margin-top: 1rem;
+    }
+
+    [data-testid="stChatInput"] input {
+        background-color: white;
+        border: 2px solid #1f77b4;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 6px rgba(31, 119, 180, 0.1);
+    }
+
+    [data-testid="stChatInput"] input:focus {
+        border-color: #1f77b4;
+        box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1), 0 2px 6px rgba(31, 119, 180, 0.15);
+    }
+
+    [data-testid="stHorizontalBlock"] {
+        gap: 0.5rem;
+    }
+
+    .stDivider {
+        margin: 1.5rem 0;
     }
 </style>
 """, unsafe_allow_html=True)
