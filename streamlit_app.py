@@ -94,21 +94,23 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input {
-        background-color: transparent;
-        border: 1px solid #999;
-        border-radius: 4px;
-        padding: 0.6rem 0.8rem;
-        font-size: 0.95rem;
-        color: #333;
+        background-color: transparent !important;
+        border: 1px solid #999 !important;
+        border-radius: 4px !important;
+        padding: 0.6rem 0.8rem !important;
+        font-size: 0.95rem !important;
+        color: #333 !important;
+        box-shadow: none !important;
     }
 
     [data-testid="stChatInput"] input::placeholder {
-        color: #bbb;
+        color: #bbb !important;
     }
 
     [data-testid="stChatInput"] input:focus {
-        border-color: #333;
-        outline: none;
+        border-color: #333 !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
 
 
@@ -300,25 +302,32 @@ with main_col:
     }
 
     .speech-btn {
-        background-color: transparent;
-        color: #333;
-        border: 1px solid #999;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        cursor: pointer;
-        white-space: nowrap;
-        flex-shrink: 0;
+        background-color: transparent !important;
+        color: #333 !important;
+        border: 1px solid #999 !important;
+        border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        box-shadow: none !important;
     }
 
     .speech-btn:hover {
-        border-color: #333;
+        border-color: #333 !important;
+        background-color: #f9f9f9 !important;
+    }
+
+    .speech-btn:active {
+        border-color: #333 !important;
+        background-color: #f0f0f0 !important;
     }
 
     .speech-btn.listening {
-        border-color: #333;
-        background-color: #f5f5f5;
+        border-color: #333 !important;
+        background-color: #f5f5f5 !important;
     }
 
     .audio-visualizer {
