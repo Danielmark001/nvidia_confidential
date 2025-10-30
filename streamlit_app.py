@@ -157,7 +157,7 @@ st.markdown("""
         bottom: 2rem !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        margin-left: -470px !important;
+        margin-left: 420px !important;
         z-index: 1001 !important;
     }
 
