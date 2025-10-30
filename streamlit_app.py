@@ -460,7 +460,18 @@ Answer following the EXAMPLE format. Use ONLY the data provided above."""
                     message_data["audio"] = audio_data
 
                 st.session_state.messages.append(message_data)
-                st.scroll_to_bottom()
+
+                # Scroll to input box
+                st.markdown("""
+                <script>
+                    setTimeout(() => {
+                        const inputBox = document.querySelector('[data-testid="stChatInput"]');
+                        if (inputBox) {
+                            inputBox.scrollIntoView({behavior: 'smooth', block: 'end'});
+                        }
+                    }, 100);
+                </script>
+                """, unsafe_allow_html=True)
 
             except Exception as e:
                 error_msg = f"Error: {str(e)}"
@@ -469,7 +480,18 @@ Answer following the EXAMPLE format. Use ONLY the data provided above."""
                     "role": "assistant",
                     "content": error_msg
                 })
-                st.scroll_to_bottom()
+
+                # Scroll to input box
+                st.markdown("""
+                <script>
+                    setTimeout(() => {
+                        const inputBox = document.querySelector('[data-testid="stChatInput"]');
+                        if (inputBox) {
+                            inputBox.scrollIntoView({behavior: 'smooth', block: 'end'});
+                        }
+                    }, 100);
+                </script>
+                """, unsafe_allow_html=True)
 
     # Footer
     st.markdown("---")
