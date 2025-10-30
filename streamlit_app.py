@@ -134,21 +134,22 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input {
-        background-color: #f9f9f9 !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 24px !important;
-        padding: 1rem 1.5rem !important;
-        font-size: 1rem !important;
-        color: #333 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-        transition: all 0.2s ease !important;
+        background-color: white !important;
+        border: 2px solid #d0d0e0 !important;
+        border-radius: 28px !important;
+        padding: 1.1rem 1.8rem !important;
+        font-size: 1.05rem !important;
+        color: #2c3e50 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        transition: all 0.3s ease !important;
     }
 
     [data-testid="stChatInput"] input:focus {
         border-color: #667eea !important;
         background-color: white !important;
         outline: none !important;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25) !important;
+        transform: translateY(-1px) !important;
     }
 
     /* File uploader styling - compact and user-friendly */
@@ -160,36 +161,38 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] section {
-        padding: 0.4rem 0.6rem !important;
-        border: 1px solid #d0d0d0 !important;
-        border-radius: 8px !important;
-        background-color: #fafafa !important;
-        transition: all 0.2s ease !important;
+        padding: 0.8rem 1.2rem !important;
+        border: 2px solid #667eea !important;
+        border-radius: 24px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        transition: all 0.3s ease !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3) !important;
     }
 
     [data-testid="stFileUploader"] section:hover {
-        background-color: #f0f0f0 !important;
-        border-color: #667eea !important;
-        box-shadow: 0 1px 4px rgba(102, 126, 234, 0.2) !important;
+        background: linear-gradient(135deg, #5568d3 0%, #6a4091 100%) !important;
+        box-shadow: 0 5px 18px rgba(102, 126, 234, 0.45) !important;
+        transform: translateY(-2px) !important;
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 0.9rem !important;
-        padding: 0.4rem 0.8rem !important;
+        font-size: 0.95rem !important;
+        padding: 0.2rem 0.5rem !important;
         background: transparent !important;
         border: none !important;
-        opacity: 0.7 !important;
-        transition: all 0.2s !important;
+        transition: all 0.3s !important;
         cursor: pointer !important;
-        color: #666 !important;
+        color: white !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.3px !important;
     }
 
     [data-testid="stFileUploader"] button:hover {
-        opacity: 1 !important;
         background: transparent !important;
+        color: white !important;
     }
 
     [data-testid="stFileUploader"] button span {
@@ -215,7 +218,8 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input::placeholder {
-        color: #999 !important;
+        color: #95a5a6 !important;
+        font-weight: 400 !important;
     }
 
     [data-testid="stHorizontalBlock"] {
