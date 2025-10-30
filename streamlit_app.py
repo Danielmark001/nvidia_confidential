@@ -119,7 +119,6 @@ st.markdown("""
         box-shadow: none !important;
     }
 
-
     [data-testid="stHorizontalBlock"] {
         gap: 0.5rem;
     }
@@ -258,7 +257,7 @@ with main_col:
         <div class="info-box">
             <strong>How to use:</strong><br>
             • Type a question about medications in the input box<br>
-            • Or click the "Speak Now" button to ask directly by voice<br>
+            • Or click the "Speak" button to ask directly by voice<br>
             • Upload an audio file for transcription (if voice is enabled)<br>
             • Get answers from our knowledge graph of 15,236+ medications
         </div>
