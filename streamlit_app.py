@@ -131,6 +131,7 @@ st.markdown("""
         padding: 1.5rem 2rem 2rem 2rem !important;
         box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
         margin: 0 !important;
+        margin-left: 0 !important;
     }
 
     [data-testid="stChatInput"] input {
