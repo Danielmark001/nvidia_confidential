@@ -363,6 +363,18 @@ with main_col:
                     )
 
                     with driver.session() as session:
+                        # Extract key medication terms from user question
+                        # Remove common question words to improve search accuracy
+                        stop_words = ['what', 'is', 'are', 'the', 'tell', 'me', 'about', 'how', 'does',
+                                     'do', 'can', 'you', 'explain', 'describe', 'a', 'an', 'for', 'used',
+                                     'work', 'works', 'help', 'treat', 'treats', 'use', 'uses']
+                        search_terms = ' '.join([word for word in user_input.lower().split()
+                                                if word not in stop_words])
+
+                        # If we removed everything, use original input
+                        if not search_terms.strip():
+                            search_terms = user_input
+
                         result = session.run("""
                             CALL db.index.fulltext.queryNodes('medication_fulltext', $search_term)
                             YIELD node, score
@@ -370,7 +382,7 @@ with main_col:
                                    node.description as description,
                                    node.indication as indication
                             LIMIT 3
-                        """, search_term=user_input)
+                        """, search_term=search_terms)
 
                         kg_results = []
                         for record in result:
