@@ -460,6 +460,7 @@ Answer following the EXAMPLE format. Use ONLY the data provided above."""
                     message_data["audio"] = audio_data
 
                 st.session_state.messages.append(message_data)
+                st.scroll_to_bottom()
 
             except Exception as e:
                 error_msg = f"Error: {str(e)}"
@@ -468,6 +469,7 @@ Answer following the EXAMPLE format. Use ONLY the data provided above."""
                     "role": "assistant",
                     "content": error_msg
                 })
+                st.scroll_to_bottom()
 
     # Footer
     st.markdown("---")
