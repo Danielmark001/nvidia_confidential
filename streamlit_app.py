@@ -352,9 +352,6 @@ with main_col:
         <p style="color: #666; margin-top: 0.5rem; font-size: 0.9rem;">
             Powered by NVIDIA NIM (Llama 3.1 70B) | Neo4j Knowledge Graph | ElevenLabs Voice
         </p>
-        <div style="background: #ff6b6b; color: white; padding: 0.5rem; margin-top: 1rem; border-radius: 8px;">
-            🔄 UPDATED VERSION - New UI with bigger input box!
-        </div>
     </div>
     """, unsafe_allow_html=True)
 
