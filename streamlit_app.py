@@ -86,71 +86,59 @@ st.markdown("""
     [data-testid="stChatInput"] {
         position: sticky;
         bottom: 0;
-        background: linear-gradient(135deg, #1f77b4 0%, #155a9c 100%);
+        background-color: white;
         z-index: 100;
-        padding: 1.5rem;
-        border-top: 3px solid #0f3f6b;
-        border-radius: 12px 12px 0 0;
-        box-shadow: 0 -8px 24px rgba(31, 119, 180, 0.3);
+        padding: 1rem;
+        border-top: 1px solid #ddd;
         margin-top: 1rem;
     }
 
     [data-testid="stChatInput"] input {
         background-color: white;
-        border: 2px solid #1f77b4;
-        border-radius: 8px;
-        padding: 0.85rem 1.2rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
         font-size: 0.95rem;
-        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.2);
         color: #333;
     }
 
     [data-testid="stChatInput"] input::placeholder {
-        color: #999;
+        color: #aaa;
     }
 
     [data-testid="stChatInput"] input:focus {
-        border-color: #0f3f6b;
-        box-shadow: 0 0 0 4px rgba(31, 119, 180, 0.2), 0 4px 12px rgba(31, 119, 180, 0.3);
+        border-color: #666;
+        box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.1);
         outline: none;
     }
 
     .mic-button {
-        background-color: #ff4444;
+        background-color: #333;
         color: white;
         border: none;
-        border-radius: 8px;
-        padding: 0.75rem 1.2rem;
+        border-radius: 6px;
+        padding: 0.7rem 1rem;
         font-size: 0.9rem;
-        font-weight: 600;
+        font-weight: 500;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
         transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
     }
 
     .mic-button:hover {
-        background-color: #ff2222;
-        box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+        background-color: #222;
     }
 
     .mic-button.listening {
-        background-color: #ff0000;
-        box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
-        animation: pulse 1s infinite;
+        background-color: #666;
+        animation: pulse-subtle 1s infinite;
     }
 
-    @keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
+    @keyframes pulse-subtle {
+        0%, 100% {
+            opacity: 1;
         }
         50% {
-            box-shadow: 0 0 0 8px rgba(255, 68, 68, 0.1);
-        }
-        100% {
-            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
+            opacity: 0.7;
         }
     }
 
