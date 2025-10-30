@@ -122,16 +122,15 @@ st.markdown("""
     [data-testid="stChatInput"] {
         position: fixed !important;
         bottom: 0 !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 100% !important;
+        left: 350px !important;
+        width: calc(100% - 350px) !important;
         max-width: 750px !important;
         background-color: white !important;
         z-index: 1000 !important;
         padding: 1.5rem 2rem 2rem 2rem !important;
         box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
         margin: 0 !important;
-        margin-left: 0 !important;
+        margin-left: 1rem !important;
     }
 
     [data-testid="stChatInput"] input {
@@ -156,7 +155,7 @@ st.markdown("""
     [data-testid="stFileUploader"] {
         position: fixed !important;
         bottom: 2rem !important;
-        right: 2rem !important;
+        left: 1120px !important;
         z-index: 1001 !important;
     }
 
