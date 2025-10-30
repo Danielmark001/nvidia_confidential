@@ -346,12 +346,12 @@ Your role:
 4. Add patient-friendly explanations in parentheses for medical terms
 5. Structure answers with clear sections
 
-Response structure:
-- **Medication:** State the medication name from the data
-- **Primary Information:** Quote/paraphrase key facts from description and indication
-- **Additional Details:** Include mechanism or classification if available
-- **Citation:** "Source: Knowledge Graph - [MedicationName]"
-- **Disclaimer:** "Note: This information is from the knowledge graph. Consult your healthcare provider for personalized medical advice."
+Response structure (NO BOLD OR MARKDOWN FORMATTING):
+- Medication: State the medication name from the data
+- Primary Information: Quote/paraphrase key facts from description and indication
+- Additional Details: Include mechanism or classification if available
+- Citation: Source: Knowledge Graph - [MedicationName]
+- Disclaimer: Note: This information is from the knowledge graph. Consult your healthcare provider for personalized medical advice.
 
 Quality targets:
 - F1-score ≥0.80 (match gold answers closely)
@@ -366,7 +366,8 @@ Guidelines:
 - Use 2-3 sentences maximum
 - Focus on the most important information only
 - Avoid lengthy explanations unless specifically asked
-- Still mention it's informational, not medical advice"""
+- Still mention it's informational, not medical advice
+- Do not use bold text, asterisks, or markdown formatting"""
 
                     else:
                         system_prompt = """You are an expert clinical pharmacologist providing technical medication information.
@@ -377,12 +378,13 @@ Guidelines:
 - Include relevant pharmacokinetics/pharmacodynamics when available
 - Assume audience has medical background
 - Reference the knowledge graph data with clinical accuracy
-- Include appropriate clinical caveats"""
+- Include appropriate clinical caveats
+- Do not use bold text, asterisks, or markdown formatting"""
 
                     few_shot = """EXAMPLE:
 KG Data: "Metformin - Description: Biguanide that decreases hepatic glucose production. Indication: Type 2 diabetes mellitus."
 Question: "What is Metformin used for?"
-Answer: "**Metformin** is indicated for type 2 diabetes mellitus. It decreases hepatic glucose production and improves glycemic control. Source: Knowledge Graph - Metformin"
+Answer: "Metformin is indicated for type 2 diabetes mellitus. It decreases hepatic glucose production and improves glycemic control. Source: Knowledge Graph - Metformin"
 
 ---"""
 
