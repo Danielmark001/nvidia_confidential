@@ -135,12 +135,13 @@ st.markdown("""
 
     [data-testid="stChatInput"] input {
         background-color: white !important;
-        border: 2px solid #d0d0e0 !important;
-        border-radius: 28px !important;
-        padding: 1.1rem 1.8rem !important;
-        font-size: 1.05rem !important;
-        color: #2c3e50 !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        border: 3px solid #b8c0e0 !important;
+        border-radius: 32px !important;
+        padding: 1.4rem 2rem !important;
+        font-size: 1.15rem !important;
+        color: #1a1a1a !important;
+        font-weight: 500 !important;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12) !important;
         transition: all 0.3s ease !important;
     }
 
@@ -148,8 +149,8 @@ st.markdown("""
         border-color: #667eea !important;
         background-color: white !important;
         outline: none !important;
-        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25) !important;
-        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3) !important;
+        transform: translateY(-2px) !important;
     }
 
     /* File uploader styling - compact and user-friendly */
@@ -185,18 +186,23 @@ st.markdown("""
         border: none !important;
         transition: all 0.3s !important;
         cursor: pointer !important;
-        color: white !important;
+        color: #ffffff !important;
         font-weight: 600 !important;
         letter-spacing: 0.3px !important;
     }
 
     [data-testid="stFileUploader"] button:hover {
         background: transparent !important;
-        color: white !important;
+        color: #ffffff !important;
     }
 
     [data-testid="stFileUploader"] button span {
         display: block !important;
+        color: #ffffff !important;
+    }
+
+    [data-testid="stFileUploader"] button * {
+        color: #ffffff !important;
     }
 
     [data-testid="stFileUploader"] button::before {
