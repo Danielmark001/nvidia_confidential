@@ -94,21 +94,20 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input {
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        padding: 0.75rem 1rem;
+        background-color: transparent;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 0.6rem 0.8rem;
         font-size: 0.95rem;
         color: #333;
     }
 
     [data-testid="stChatInput"] input::placeholder {
-        color: #aaa;
+        color: #bbb;
     }
 
     [data-testid="stChatInput"] input:focus {
-        border-color: #666;
-        box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.1);
+        border-color: #333;
         outline: none;
     }
 
@@ -330,12 +329,12 @@ with main_col:
     }
 
     .speech-btn {
-        background-color: #333;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
+        background-color: transparent;
+        color: #333;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
         font-weight: 500;
         cursor: pointer;
         white-space: nowrap;
@@ -343,11 +342,12 @@ with main_col:
     }
 
     .speech-btn:hover {
-        background-color: #222;
+        border-color: #333;
     }
 
     .speech-btn.listening {
-        background-color: #666;
+        border-color: #333;
+        background-color: #f5f5f5;
     }
 
     .audio-visualizer {
