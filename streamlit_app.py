@@ -211,6 +211,25 @@ with st.sidebar:
 
     st.divider()
 
+    with st.container():
+        st.markdown("<h3 style='margin-top: 0; color: #333;'>Voice Options</h3>", unsafe_allow_html=True)
+
+        if st.session_state.voice_enabled:
+            enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs", key="sidebar_tts")
+
+            audio_file = st.file_uploader(
+                "Upload audio file",
+                type=["wav", "mp3", "ogg", "m4a", "webm"],
+                key="sidebar_audio_uploader",
+                help="Upload an audio file to transcribe and ask (ElevenLabs)"
+            )
+        else:
+            enable_tts = False
+            audio_file = None
+            st.info("ElevenLabs API not configured")
+
+    st.divider()
+
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Reset Settings", use_container_width=True):
@@ -286,28 +305,7 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Input section - always visible
-    st.divider()
-
-    # Upload audio file
-    if st.session_state.voice_enabled:
-        audio_file = st.file_uploader(
-            "Upload audio file",
-            type=["wav", "mp3", "ogg", "m4a", "webm"],
-            key="audio_uploader",
-            help="Upload an audio file to transcribe and ask (ElevenLabs)"
-        )
-    else:
-        audio_file = None
-        st.info("Upload audio: ElevenLabs API not configured")
-
-    # Voice reply checkbox
-    if st.session_state.voice_enabled:
-        enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs")
-    else:
-        enable_tts = False
-
-    # Text input
+    # Text input - always at bottom like ChatGPT
     user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
