@@ -126,13 +126,31 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] {
-        margin: 0 !important;
+        position: fixed !important;
+        bottom: 1.5rem !important;
+        right: calc(50% - 420px) !important;
+        z-index: 1001 !important;
+        width: 40px !important;
     }
 
     [data-testid="stFileUploader"] section {
-        padding: 0.5rem !important;
-        border: 2px solid #999 !important;
-        border-radius: 8px !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    [data-testid="stFileUploader"] button {
+        background: transparent !important;
+        border: none !important;
+        padding: 0.3rem !important;
+        font-size: 1.3rem !important;
+        opacity: 0.6 !important;
+        transition: opacity 0.2s !important;
+    }
+
+    [data-testid="stFileUploader"] button:hover {
+        opacity: 1 !important;
+        background: transparent !important;
     }
 
     [data-testid="stChatInput"] input {
@@ -321,23 +339,44 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Input area - audio upload beside text input like ChatGPT
-    col1, col2 = st.columns([5, 1])
+    # Input area with audio upload icon like ChatGPT
+    if st.session_state.voice_enabled:
+        # Create custom HTML for audio upload button
+        st.markdown("""
+        <style>
+            .upload-container {
+                position: fixed;
+                bottom: 1.5rem;
+                right: 5rem;
+                z-index: 1001;
+            }
+            .upload-btn {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 1.3rem;
+                padding: 0.3rem;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+            .upload-btn:hover {
+                opacity: 1;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
-    with col1:
-        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+        audio_file = st.file_uploader(
+            "📎",
+            type=["wav", "mp3", "ogg", "m4a", "webm"],
+            key="audio_uploader",
+            help="Upload audio file",
+            label_visibility="collapsed"
+        )
+    else:
+        audio_file = None
 
-    with col2:
-        if st.session_state.voice_enabled:
-            audio_file = st.file_uploader(
-                "🎤",
-                type=["wav", "mp3", "ogg", "m4a", "webm"],
-                key="audio_uploader",
-                help="Upload audio file",
-                label_visibility="collapsed"
-            )
-        else:
-            audio_file = None
+    # Text input
+    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
