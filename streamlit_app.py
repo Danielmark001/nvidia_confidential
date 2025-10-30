@@ -328,38 +328,53 @@ with main_col:
         # Speech input button
         st.markdown("""
         <script>
-            // Web Speech API for direct speech input
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (SpeechRecognition) {
+            function initSpeechRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+                if (!SpeechRecognition) {
+                    console.error('Speech Recognition not supported');
+                    return;
+                }
+
                 window.recognition = new SpeechRecognition();
                 window.recognition.continuous = false;
-                window.recognition.interimResults = true;
+                window.recognition.interimResults = false;
                 window.recognition.lang = 'en-US';
 
                 window.startSpeech = function() {
-                    const btn = document.getElementById('speech-btn');
-                    btn.classList.add('listening');
-                    btn.innerText = '🎤 Listening...';
-                    window.recognition.start();
+                    try {
+                        const btn = document.getElementById('speech-btn');
+                        btn.classList.add('listening');
+                        btn.innerText = '🎤 Listening...';
+                        window.recognition.start();
+                    } catch (error) {
+                        console.error('Error starting speech:', error);
+                    }
                 };
 
                 window.recognition.onresult = function(event) {
                     let transcript = '';
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        transcript += event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            transcript += event.results[i][0].transcript;
+                        }
                     }
 
-                    if (event.results[event.results.length - 1].isFinal) {
+                    if (transcript) {
                         const btn = document.getElementById('speech-btn');
                         btn.classList.remove('listening');
                         btn.innerText = '🎤 Speak Now';
 
-                        // Set the input field value and trigger change
-                        const input = document.querySelector('[data-testid="stChatInput"] input');
-                        if (input) {
-                            input.value = transcript;
-                            input.dispatchEvent(new Event('input', { bubbles: true }));
-                            setTimeout(() => input.focus(), 100);
+                        const inputs = document.querySelectorAll('input[type="text"]');
+                        const chatInput = Array.from(inputs).find(input =>
+                            input.placeholder && input.placeholder.includes('medications')
+                        );
+
+                        if (chatInput) {
+                            chatInput.value = transcript;
+                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            chatInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            setTimeout(() => chatInput.focus(), 100);
                         }
                     }
                 };
@@ -368,11 +383,24 @@ with main_col:
                     const btn = document.getElementById('speech-btn');
                     btn.classList.remove('listening');
                     btn.innerText = '🎤 Speak Now';
-                    console.error('Speech error:', event.error);
+                    alert('Speech error: ' + event.error);
+                };
+
+                window.recognition.onend = function() {
+                    const btn = document.getElementById('speech-btn');
+                    btn.classList.remove('listening');
+                    btn.innerText = '🎤 Speak Now';
                 };
             }
+
+            // Initialize when page loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSpeechRecognition);
+            } else {
+                initSpeechRecognition();
+            }
         </script>
-        <button id="speech-btn" class="mic-button" onclick="window.startSpeech()" style="margin-top: 0.5rem; width: 100%;">
+        <button id="speech-btn" class="mic-button" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')">
             🎤 Speak Now
         </button>
         """, unsafe_allow_html=True)
