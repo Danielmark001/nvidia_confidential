@@ -11,11 +11,14 @@ import io
 load_dotenv()
 
 def get_secret(key: str, default: str = "") -> str:
+    # Try Streamlit secrets first
     try:
-        return st.secrets[key]
+        if key in st.secrets:
+            return st.secrets[key]
     except:
         pass
 
+    # Try environment variable
     env_val = os.getenv(key)
     if env_val:
         return env_val
@@ -250,6 +253,7 @@ with main_col:
                 st.session_state.voice_enabled = True
             else:
                 st.markdown('<span class="status-badge status-error">✗ ElevenLabs</span>', unsafe_allow_html=True)
+                st.session_state.voice_enabled = False
 
     # Quick info
     if not st.session_state.messages:
