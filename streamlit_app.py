@@ -345,6 +345,33 @@ with main_col:
         # Generate response
         with st.chat_message("assistant", avatar="💊"):
             try:
+                # Step 0: Extract medication names from question using LLM
+                with st.spinner("Understanding your question..."):
+                    from openai import OpenAI
+
+                    client = OpenAI(
+                        base_url="https://integrate.api.nvidia.com/v1",
+                        api_key=get_secret("NVIDIA_API_KEY")
+                    )
+
+                    extraction_response = client.chat.completions.create(
+                        model=model_choice,
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "You are a medication name extractor. Extract ONLY the medication names, drug names, or medical conditions mentioned in the user's question. Return them as a comma-separated list. If no specific medication is mentioned, return the key medical terms. Examples:\n- 'What is insulin?' -> 'insulin'\n- 'Tell me about metformin for diabetes' -> 'metformin, diabetes'\n- 'How does aspirin work?' -> 'aspirin'\n- 'What treats high blood pressure?' -> 'high blood pressure, hypertension'\nReturn ONLY the terms, no explanation."
+                            },
+                            {
+                                "role": "user",
+                                "content": user_input
+                            }
+                        ],
+                        temperature=0.0,
+                        max_tokens=50
+                    )
+
+                    search_terms = extraction_response.choices[0].message.content.strip()
+
                 # Step 1: Query Neo4j
                 with st.spinner("Searching medication database..."):
                     from neo4j import GraphDatabase
@@ -363,18 +390,6 @@ with main_col:
                     )
 
                     with driver.session() as session:
-                        # Extract key medication terms from user question
-                        # Remove common question words to improve search accuracy
-                        stop_words = ['what', 'is', 'are', 'the', 'tell', 'me', 'about', 'how', 'does',
-                                     'do', 'can', 'you', 'explain', 'describe', 'a', 'an', 'for', 'used',
-                                     'work', 'works', 'help', 'treat', 'treats', 'use', 'uses']
-                        search_terms = ' '.join([word for word in user_input.lower().split()
-                                                if word not in stop_words])
-
-                        # If we removed everything, use original input
-                        if not search_terms.strip():
-                            search_terms = user_input
-
                         result = session.run("""
                             CALL db.index.fulltext.queryNodes('medication_fulltext', $search_term)
                             YIELD node, score
