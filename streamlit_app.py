@@ -119,7 +119,7 @@ st.markdown("""
         box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
     }
 
-    [data-testid="stHorizontalBlock"]:has([data-testid="stChatInput"]) {
+    [data-testid="stChatInput"] {
         position: fixed !important;
         bottom: 0 !important;
         left: 50% !important;
@@ -130,13 +130,7 @@ st.markdown("""
         z-index: 1000 !important;
         padding: 1.5rem 2rem 2rem 2rem !important;
         box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
-        gap: 1rem !important;
-        align-items: center !important;
-    }
-
-    [data-testid="stChatInput"] {
         margin: 0 !important;
-        flex: 1 !important;
     }
 
     [data-testid="stChatInput"] input {
@@ -157,37 +151,51 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
     }
 
-    /* File uploader styling - compact button */
+    /* File uploader styling - positioned inside text input like Claude */
     [data-testid="stFileUploader"] {
-        margin: 0 !important;
+        position: fixed !important;
+        bottom: 2.2rem !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        margin-left: -450px !important;
+        z-index: 1001 !important;
+        width: 40px !important;
     }
 
     [data-testid="stFileUploader"] section {
-        padding: 0.75rem !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 50% !important;
-        background-color: #f9f9f9 !important;
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: transparent !important;
         transition: all 0.2s ease !important;
-        width: 48px !important;
-        height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
     }
 
     [data-testid="stFileUploader"] section:hover {
-        background-color: white !important;
-        border-color: #667eea !important;
-        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15) !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 1.5rem !important;
-        padding: 0 !important;
+        font-size: 1.3rem !important;
+        padding: 0.3rem !important;
         background: transparent !important;
         border: none !important;
-        width: 48px !important;
-        height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
+        opacity: 0.5 !important;
+        transition: opacity 0.2s !important;
+        cursor: pointer !important;
+    }
+
+    [data-testid="stFileUploader"] button:hover {
+        opacity: 1 !important;
+        background: transparent !important;
     }
 
     [data-testid="stFileUploader"] button span {
@@ -196,7 +204,7 @@ st.markdown("""
 
     [data-testid="stFileUploader"] button::before {
         content: "📎" !important;
-        font-size: 1.5rem !important;
+        font-size: 1.3rem !important;
     }
 
     [data-testid="stFileUploader"] label {
@@ -394,26 +402,20 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Input area centered like Claude - audio upload and text input side by side
-    col_spacer, col1, col2 = st.columns([0.5, 0.5, 9])
+    # Audio upload (will be positioned inside the text input with CSS)
+    if st.session_state.voice_enabled:
+        audio_file = st.file_uploader(
+            "📎",
+            type=["wav", "mp3", "ogg", "m4a", "webm"],
+            key="audio_uploader",
+            help="Upload audio",
+            label_visibility="collapsed"
+        )
+    else:
+        audio_file = None
 
-    with col_spacer:
-        st.write("")
-
-    with col1:
-        if st.session_state.voice_enabled:
-            audio_file = st.file_uploader(
-                "📎",
-                type=["wav", "mp3", "ogg", "m4a", "webm"],
-                key="audio_uploader",
-                help="Upload audio",
-                label_visibility="collapsed"
-            )
-        else:
-            audio_file = None
-
-    with col2:
-        user_input = st.chat_input("How can I help you today?", key="text_input")
+    # Text input
+    user_input = st.chat_input("How can I help you today?", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
