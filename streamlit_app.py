@@ -12,12 +12,20 @@ load_dotenv()
 
 def get_secret(key: str, default: str = "") -> str:
     try:
-        return st.secrets.get(key, os.getenv(key, default))
+        secret_val = st.secrets.get(key)
+        if secret_val:
+            return secret_val
     except (FileNotFoundError, AttributeError):
-        return os.getenv(key, default)
+        pass
+
+    env_val = os.getenv(key)
+    if env_val:
+        return env_val
+
+    return default
 
 st.set_page_config(
-    page_title="Medication Advisor AI",
+    page_title="Medication Advisor AI - Updated",
     page_icon="💊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -531,9 +539,17 @@ if (document.readyState === 'loading') {
                 with st.spinner("Searching medication database..."):
                     from neo4j import GraphDatabase
 
+                    neo4j_uri = get_secret("NEO4J_URI")
+                    neo4j_user = get_secret("NEO4J_USERNAME")
+                    neo4j_pass = get_secret("NEO4J_PASSWORD")
+
+                    if not neo4j_uri or not neo4j_user or not neo4j_pass:
+                        st.error("Neo4j credentials not configured. Please check your .streamlit/secrets.toml file.")
+                        st.stop()
+
                     driver = GraphDatabase.driver(
-                        get_secret("NEO4J_URI"),
-                        auth=(get_secret("NEO4J_USERNAME"), get_secret("NEO4J_PASSWORD"))
+                        neo4j_uri,
+                        auth=(neo4j_user, neo4j_pass)
                     )
 
                     with driver.session() as session:
