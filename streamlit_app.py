@@ -297,115 +297,106 @@ with main_col:
                 st.audio(message["audio"], format="audio/mp3")
 
     # Input section - always visible
-    with st.container():
-        st.divider()
+    st.divider()
 
-        # Text input - prominently displayed
-        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+    # Text input - prominently displayed
+    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
-        # Voice options row
-        voice_col1, voice_col2, voice_col3 = st.columns([2, 1, 1])
+    # Voice settings
+    if st.session_state.voice_enabled:
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            audio_file = st.file_uploader(
+                "Upload audio",
+                type=["wav", "mp3", "ogg", "m4a", "webm"],
+                key="audio_uploader",
+                label_visibility="collapsed",
+                help="Upload an audio file to transcribe and ask"
+            )
+        with col2:
+            enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses")
+    else:
+        audio_file = None
+        enable_tts = False
 
-        with voice_col1:
-            if st.session_state.voice_enabled:
-                audio_file = st.file_uploader(
-                    "Upload audio",
-                    type=["wav", "mp3", "ogg", "m4a", "webm"],
-                    key="audio_uploader",
-                    label_visibility="collapsed",
-                    help="Upload an audio file to transcribe and ask"
-                )
-            else:
-                audio_file = None
+    # Speech input button
+    st.markdown("""
+<script>
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        with voice_col2:
-            if st.session_state.voice_enabled:
-                enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses")
-            else:
-                enable_tts = False
+    if (!SpeechRecognition) {
+        console.error('Speech Recognition not supported');
+        return;
+    }
 
-        with voice_col3:
-            st.empty()
+    window.recognition = new SpeechRecognition();
+    window.recognition.continuous = false;
+    window.recognition.interimResults = false;
+    window.recognition.lang = 'en-US';
 
-        # Speech input button
-        st.markdown("""
-        <script>
-            function initSpeechRecognition() {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    window.startSpeech = function() {
+        try {
+            const btn = document.getElementById('speech-btn');
+            btn.classList.add('listening');
+            btn.innerText = '🎤 Listening...';
+            window.recognition.start();
+        } catch (error) {
+            console.error('Error starting speech:', error);
+        }
+    };
 
-                if (!SpeechRecognition) {
-                    console.error('Speech Recognition not supported');
-                    return;
-                }
-
-                window.recognition = new SpeechRecognition();
-                window.recognition.continuous = false;
-                window.recognition.interimResults = false;
-                window.recognition.lang = 'en-US';
-
-                window.startSpeech = function() {
-                    try {
-                        const btn = document.getElementById('speech-btn');
-                        btn.classList.add('listening');
-                        btn.innerText = '🎤 Listening...';
-                        window.recognition.start();
-                    } catch (error) {
-                        console.error('Error starting speech:', error);
-                    }
-                };
-
-                window.recognition.onresult = function(event) {
-                    let transcript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        if (event.results[i].isFinal) {
-                            transcript += event.results[i][0].transcript;
-                        }
-                    }
-
-                    if (transcript) {
-                        const btn = document.getElementById('speech-btn');
-                        btn.classList.remove('listening');
-                        btn.innerText = '🎤 Speak Now';
-
-                        const inputs = document.querySelectorAll('input[type="text"]');
-                        const chatInput = Array.from(inputs).find(input =>
-                            input.placeholder && input.placeholder.includes('medications')
-                        );
-
-                        if (chatInput) {
-                            chatInput.value = transcript;
-                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-                            chatInput.dispatchEvent(new Event('change', { bubbles: true }));
-                            setTimeout(() => chatInput.focus(), 100);
-                        }
-                    }
-                };
-
-                window.recognition.onerror = function(event) {
-                    const btn = document.getElementById('speech-btn');
-                    btn.classList.remove('listening');
-                    btn.innerText = '🎤 Speak Now';
-                    alert('Speech error: ' + event.error);
-                };
-
-                window.recognition.onend = function() {
-                    const btn = document.getElementById('speech-btn');
-                    btn.classList.remove('listening');
-                    btn.innerText = '🎤 Speak Now';
-                };
+    window.recognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                transcript += event.results[i][0].transcript;
             }
+        }
 
-            // Initialize when page loads
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initSpeechRecognition);
-            } else {
-                initSpeechRecognition();
+        if (transcript) {
+            const btn = document.getElementById('speech-btn');
+            btn.classList.remove('listening');
+            btn.innerText = '🎤 Speak Now';
+
+            const inputs = document.querySelectorAll('input[type="text"]');
+            const chatInput = Array.from(inputs).find(input =>
+                input.placeholder && input.placeholder.includes('medications')
+            );
+
+            if (chatInput) {
+                chatInput.value = transcript;
+                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                chatInput.dispatchEvent(new Event('change', { bubbles: true }));
+                setTimeout(() => chatInput.focus(), 100);
             }
-        </script>
-        <button id="speech-btn" class="mic-button" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')" style="width: 100%; margin-top: 0.5rem;">
-            🎤 Speak Now
-        </button>
-        """, unsafe_allow_html=True)
+        }
+    };
+
+    window.recognition.onerror = function(event) {
+        const btn = document.getElementById('speech-btn');
+        btn.classList.remove('listening');
+        btn.innerText = '🎤 Speak Now';
+        alert('Speech error: ' + event.error);
+    };
+
+    window.recognition.onend = function() {
+        const btn = document.getElementById('speech-btn');
+        btn.classList.remove('listening');
+        btn.innerText = '🎤 Speak Now';
+    };
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpeechRecognition);
+} else {
+    initSpeechRecognition();
+}
+</script>
+<button id="speech-btn" class="mic-button" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')" style="width: 100%; margin-top: 0.5rem;">
+    🎤 Speak Now
+</button>
+""", unsafe_allow_html=True)
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
