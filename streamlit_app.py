@@ -111,35 +111,6 @@ st.markdown("""
         outline: none;
     }
 
-    .mic-button {
-        background-color: #333;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 0.7rem 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .mic-button:hover {
-        background-color: #222;
-    }
-
-    .mic-button.listening {
-        background-color: #666;
-        animation: pulse-subtle 1s infinite;
-    }
-
-    @keyframes pulse-subtle {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.7;
-        }
-    }
 
     [data-testid="stHorizontalBlock"] {
         gap: 0.5rem;
@@ -324,7 +295,7 @@ with main_col:
     .speech-container {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.5rem;
         margin-top: 0.5rem;
     }
 
@@ -351,15 +322,16 @@ with main_col:
     }
 
     .audio-visualizer {
-        flex: 1;
-        height: 40px;
+        width: 150px;
+        height: 30px;
         background-color: #f5f5f5;
-        border-radius: 6px;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         overflow: hidden;
+        border: 1px solid #999;
     }
 
     #audioCanvas {
