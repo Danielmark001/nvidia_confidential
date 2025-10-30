@@ -280,10 +280,7 @@ with main_col:
     # Input section - always visible
     st.divider()
 
-    # Text input - prominently displayed
-    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
-
-    # Voice settings - always show
+    # Voice settings - show first
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.session_state.voice_enabled:
@@ -306,24 +303,38 @@ with main_col:
     st.markdown("""
 <style>
     .speech-btn {
-        background-color: transparent !important;
-        color: #333 !important;
-        border: 1px solid #999 !important;
-        border-radius: 4px !important;
-        padding: 0.5rem 1rem !important;
-        font-size: 0.85rem !important;
-        font-weight: 500 !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
         cursor: pointer !important;
-        box-shadow: none !important;
+        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3) !important;
+        transition: all 0.3s ease !important;
+        width: 100%;
+        margin: 0.5rem 0;
     }
 
     .speech-btn:hover {
-        border-color: #333 !important;
-        background-color: #f9f9f9 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    .speech-btn:active {
+        transform: translateY(0) !important;
     }
 
     .speech-btn.listening {
-        background-color: #f5f5f5 !important;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+        box-shadow: 0 4px 6px rgba(17, 153, 142, 0.3) !important;
+        animation: pulse 1.5s infinite !important;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
     }
 </style>
 
@@ -400,6 +411,9 @@ if (document.readyState !== 'loading') {
 }
 </script>
 """, unsafe_allow_html=True)
+
+    # Text input - below speak button
+    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
