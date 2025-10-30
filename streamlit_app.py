@@ -280,23 +280,26 @@ with main_col:
     # Text input - prominently displayed
     user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
-    # Voice settings
-    if st.session_state.voice_enabled:
-        col1, col2 = st.columns([2, 1])
-        with col1:
+    # Voice settings - always show
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        if st.session_state.voice_enabled:
             audio_file = st.file_uploader(
                 "Upload audio file",
                 type=["wav", "mp3", "ogg", "m4a", "webm"],
                 key="audio_uploader",
-                help="Upload an audio file to transcribe and ask"
+                help="Upload an audio file to transcribe and ask (ElevenLabs)"
             )
-        with col2:
-            enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses")
-    else:
-        audio_file = None
-        enable_tts = False
+        else:
+            audio_file = None
+            st.info("Upload audio: ElevenLabs API not configured")
+    with col2:
+        if st.session_state.voice_enabled:
+            enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs")
+        else:
+            enable_tts = False
 
-    # Speech input button
+    # Speech input button (works with browser, no API needed)
     st.markdown("""
 <style>
     .speech-btn {
