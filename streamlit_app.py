@@ -40,7 +40,7 @@ st.markdown("""
     }
 
     .main {
-        max-width: 900px;
+        max-width: 1000px;
         margin: 0 auto;
     }
 
@@ -125,12 +125,13 @@ st.markdown("""
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 100% !important;
-        max-width: 800px !important;
+        max-width: 1000px !important;
         background-color: white !important;
         z-index: 1000 !important;
         padding: 1.5rem 2rem 2rem 2rem !important;
         box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
         gap: 1rem !important;
+        align-items: center !important;
     }
 
     [data-testid="stChatInput"] {
@@ -191,8 +192,25 @@ st.markdown("""
         font-size: 1.2rem !important;
     }
 
+    /* Hide drag and drop text */
+    [data-testid="stFileUploader"] small {
+        display: none !important;
+    }
+
     [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {
         display: none !important;
+    }
+
+    [data-testid="stFileUploader"] > div > div {
+        min-height: 0 !important;
+    }
+
+    [data-testid="stFileUploader"] section > div {
+        display: none !important;
+    }
+
+    [data-testid="stFileUploader"] section button {
+        position: absolute !important;
     }
 
     [data-testid="stChatInput"] input::placeholder {
