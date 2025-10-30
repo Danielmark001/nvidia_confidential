@@ -134,16 +134,16 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input {
-        background-color: white !important;
-        border: 4px solid #8b95d3 !important;
-        border-radius: 40px !important;
-        padding: 1.6rem 2.5rem !important;
-        font-size: 1.25rem !important;
+        background-color: #ffffff !important;
+        border: 5px solid #667eea !important;
+        border-radius: 50px !important;
+        padding: 2rem 3rem !important;
+        font-size: 1.4rem !important;
         color: #000000 !important;
-        font-weight: 600 !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+        font-weight: 700 !important;
+        box-shadow: 0 6px 24px rgba(102, 126, 234, 0.25) !important;
         transition: all 0.3s ease !important;
-        min-height: 60px !important;
+        min-height: 70px !important;
     }
 
     [data-testid="stChatInput"] input:focus {
