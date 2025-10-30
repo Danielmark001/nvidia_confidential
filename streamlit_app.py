@@ -26,7 +26,7 @@ def get_secret(key: str, default: str = "") -> str:
     return default
 
 st.set_page_config(
-    page_title="Medication Advisor AI - Updated",
+    page_title="Medication Advisor AI",
     page_icon="💊",
     layout="centered",
     initial_sidebar_state="expanded"
