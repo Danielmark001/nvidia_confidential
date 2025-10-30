@@ -155,9 +155,7 @@ st.markdown("""
     [data-testid="stFileUploader"] {
         position: fixed !important;
         bottom: 2rem !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        margin-left: 360px !important;
+        right: 2rem !important;
         z-index: 1001 !important;
     }
 
