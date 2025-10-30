@@ -182,17 +182,28 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 1.2rem !important;
+        font-size: 1.5rem !important;
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    [data-testid="stFileUploader"] button span {
+        display: none !important;
+    }
+
+    [data-testid="stFileUploader"] button::before {
+        content: "📎" !important;
+        font-size: 1.5rem !important;
     }
 
     [data-testid="stFileUploader"] label {
         font-size: 1.2rem !important;
     }
 
-    /* Hide drag and drop text */
+    /* Hide drag and drop text and browse files text */
     [data-testid="stFileUploader"] small {
         display: none !important;
     }
@@ -384,7 +395,10 @@ with main_col:
                 st.audio(message["audio"], format="audio/mp3")
 
     # Input area centered like Claude - audio upload and text input side by side
-    col1, col2 = st.columns([1, 9])
+    col_spacer, col1, col2 = st.columns([0.5, 0.5, 9])
+
+    with col_spacer:
+        st.write("")
 
     with col1:
         if st.session_state.voice_enabled:
