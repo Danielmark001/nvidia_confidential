@@ -102,10 +102,10 @@ st.markdown("""
     }
 
     .main > div:last-child {
-        padding-bottom: 100px;
+        padding-bottom: 120px;
     }
 
-    [data-testid="stChatInput"] {
+    [data-testid="stHorizontalBlock"]:has([data-testid="stChatInput"]) {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;
@@ -116,11 +116,23 @@ st.markdown("""
         border-top: 2px solid #e0e0e0 !important;
         margin: 0 !important;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+        max-width: 900px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 
-    [data-testid="stChatInput"] > div {
-        max-width: 900px !important;
-        margin: 0 auto !important;
+    [data-testid="stChatInput"] {
+        margin: 0 !important;
+    }
+
+    [data-testid="stFileUploader"] {
+        margin: 0 !important;
+    }
+
+    [data-testid="stFileUploader"] section {
+        padding: 0.5rem !important;
+        border: 2px solid #999 !important;
+        border-radius: 8px !important;
     }
 
     [data-testid="stChatInput"] input {
@@ -228,16 +240,8 @@ with st.sidebar:
 
         if st.session_state.voice_enabled:
             enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses via ElevenLabs", key="sidebar_tts")
-
-            audio_file = st.file_uploader(
-                "Upload audio file",
-                type=["wav", "mp3", "ogg", "m4a", "webm"],
-                key="sidebar_audio_uploader",
-                help="Upload an audio file to transcribe and ask (ElevenLabs)"
-            )
         else:
             enable_tts = False
-            audio_file = None
             st.info("ElevenLabs API not configured")
 
     st.divider()
@@ -317,8 +321,23 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Text input - always at bottom like ChatGPT
-    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+    # Input area - audio upload beside text input like ChatGPT
+    col1, col2 = st.columns([1, 5])
+
+    with col1:
+        if st.session_state.voice_enabled:
+            audio_file = st.file_uploader(
+                "🎤",
+                type=["wav", "mp3", "ogg", "m4a", "webm"],
+                key="audio_uploader",
+                help="Upload audio file",
+                label_visibility="collapsed"
+            )
+        else:
+            audio_file = None
+
+    with col2:
+        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
