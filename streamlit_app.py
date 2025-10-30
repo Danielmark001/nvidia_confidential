@@ -72,6 +72,15 @@ st.markdown("""
     [data-testid="stChatMessageContent"] {
         padding: 1rem;
     }
+
+    [data-testid="stChatInput"] {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        z-index: 100;
+        padding: 1rem 0;
+        border-top: 1px solid #e0e0e0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -218,30 +227,34 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Input section
-    st.divider()
+    # Input section - always visible
+    with st.container():
+        st.divider()
 
-    # Voice input section
-    if st.session_state.voice_enabled:
-        with st.container():
-            audio_col1, audio_col2 = st.columns([3, 1])
+        # Voice settings and audio upload
+        if st.session_state.voice_enabled:
+            voice_col1, voice_col2, voice_col3 = st.columns([2, 1, 1])
 
-            with audio_col1:
+            with voice_col1:
                 audio_file = st.file_uploader(
-                    "Upload audio (or type below)",
+                    "Upload audio",
                     type=["wav", "mp3", "ogg", "m4a", "webm"],
                     key="audio_uploader",
-                    label_visibility="collapsed"
+                    label_visibility="collapsed",
+                    help="Upload an audio file to transcribe and ask"
                 )
 
-            with audio_col2:
-                enable_tts = st.checkbox("Voice reply", value=True, help="Enable text-to-speech for responses")
-    else:
-        audio_file = None
-        enable_tts = False
+            with voice_col2:
+                enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses")
 
-    # Text input - prominently displayed
-    user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+            with voice_col3:
+                st.empty()
+        else:
+            audio_file = None
+            enable_tts = False
+
+        # Text input - prominently displayed
+        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
