@@ -322,9 +322,12 @@ with main_col:
                 st.audio(message["audio"], format="audio/mp3")
 
     # Input area - audio upload beside text input like ChatGPT
-    col1, col2 = st.columns([1, 5])
+    col1, col2 = st.columns([5, 1])
 
     with col1:
+        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+
+    with col2:
         if st.session_state.voice_enabled:
             audio_file = st.file_uploader(
                 "🎤",
@@ -335,9 +338,6 @@ with main_col:
             )
         else:
             audio_file = None
-
-    with col2:
-        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
