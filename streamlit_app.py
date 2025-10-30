@@ -282,13 +282,12 @@ with main_col:
 
     # Voice settings
     if st.session_state.voice_enabled:
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([2, 1])
         with col1:
             audio_file = st.file_uploader(
-                "Upload audio",
+                "Upload audio file",
                 type=["wav", "mp3", "ogg", "m4a", "webm"],
                 key="audio_uploader",
-                label_visibility="collapsed",
                 help="Upload an audio file to transcribe and ask"
             )
         with col2:
