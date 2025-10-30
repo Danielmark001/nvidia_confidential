@@ -151,46 +151,44 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
     }
 
-    /* File uploader styling - positioned inside text input like Claude */
+    /* File uploader styling - compact and user-friendly */
     [data-testid="stFileUploader"] {
         position: fixed !important;
-        bottom: 2.2rem !important;
+        bottom: 2rem !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        margin-left: -450px !important;
+        margin-left: -470px !important;
         z-index: 1001 !important;
-        width: 40px !important;
     }
 
     [data-testid="stFileUploader"] section {
-        padding: 0 !important;
-        border: none !important;
-        border-radius: 0 !important;
-        background-color: transparent !important;
+        padding: 0.4rem 0.6rem !important;
+        border: 1px solid #d0d0d0 !important;
+        border-radius: 8px !important;
+        background-color: #fafafa !important;
         transition: all 0.2s ease !important;
-        width: 40px !important;
-        height: 40px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
     }
 
     [data-testid="stFileUploader"] section:hover {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+        background-color: #f0f0f0 !important;
+        border-color: #667eea !important;
+        box-shadow: 0 1px 4px rgba(102, 126, 234, 0.2) !important;
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 1.3rem !important;
-        padding: 0.3rem !important;
+        font-size: 1.1rem !important;
+        padding: 0.2rem 0.4rem !important;
         background: transparent !important;
         border: none !important;
-        width: 40px !important;
-        height: 40px !important;
-        opacity: 0.5 !important;
-        transition: opacity 0.2s !important;
+        opacity: 0.7 !important;
+        transition: all 0.2s !important;
         cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
     }
 
     [data-testid="stFileUploader"] button:hover {
@@ -199,37 +197,26 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] button span {
-        display: none !important;
+        font-size: 0.85rem !important;
+        color: #666 !important;
     }
 
     [data-testid="stFileUploader"] button::before {
-        content: "📎" !important;
-        font-size: 1.3rem !important;
+        content: "🎤" !important;
+        font-size: 1.1rem !important;
     }
 
     [data-testid="stFileUploader"] label {
-        font-size: 1.2rem !important;
+        display: none !important;
     }
 
-    /* Hide drag and drop text and browse files text */
+    /* Hide drag and drop text */
     [data-testid="stFileUploader"] small {
         display: none !important;
     }
 
     [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {
         display: none !important;
-    }
-
-    [data-testid="stFileUploader"] > div > div {
-        min-height: 0 !important;
-    }
-
-    [data-testid="stFileUploader"] section > div {
-        display: none !important;
-    }
-
-    [data-testid="stFileUploader"] section button {
-        position: absolute !important;
     }
 
     [data-testid="stChatInput"] input::placeholder {
@@ -402,14 +389,13 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Audio upload (will be positioned inside the text input with CSS)
+    # Audio upload (will be positioned to the left of text input with CSS)
     if st.session_state.voice_enabled:
         audio_file = st.file_uploader(
-            "📎",
+            "Audio",
             type=["wav", "mp3", "ogg", "m4a", "webm"],
             key="audio_uploader",
-            help="Upload audio",
-            label_visibility="collapsed"
+            help="Upload audio file to transcribe"
         )
     else:
         audio_file = None
