@@ -156,28 +156,43 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
     }
 
-    /* File uploader styling */
+    /* File uploader styling - compact button */
     [data-testid="stFileUploader"] {
         margin: 0 !important;
-        min-width: 120px !important;
     }
 
     [data-testid="stFileUploader"] section {
-        padding: 0.5rem 1rem !important;
+        padding: 0.75rem !important;
         border: 1px solid #e0e0e0 !important;
-        border-radius: 20px !important;
+        border-radius: 50% !important;
         background-color: #f9f9f9 !important;
         transition: all 0.2s ease !important;
+        width: 48px !important;
+        height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     [data-testid="stFileUploader"] section:hover {
         background-color: white !important;
         border-color: #667eea !important;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15) !important;
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 0.9rem !important;
-        color: #666 !important;
+        font-size: 1.2rem !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    [data-testid="stFileUploader"] label {
+        font-size: 1.2rem !important;
+    }
+
+    [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {
+        display: none !important;
     }
 
     [data-testid="stChatInput"] input::placeholder {
@@ -351,15 +366,16 @@ with main_col:
                 st.audio(message["audio"], format="audio/mp3")
 
     # Input area centered like Claude - audio upload and text input side by side
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 9])
 
     with col1:
         if st.session_state.voice_enabled:
             audio_file = st.file_uploader(
-                "🎤 Audio",
+                "📎",
                 type=["wav", "mp3", "ogg", "m4a", "webm"],
                 key="audio_uploader",
-                help="Upload audio file to transcribe"
+                help="Upload audio",
+                label_visibility="collapsed"
             )
         else:
             audio_file = None
