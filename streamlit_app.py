@@ -102,57 +102,86 @@ st.markdown("""
     }
 
     .main > div:last-child {
-        padding-bottom: 120px;
+        padding-bottom: 150px;
+    }
+
+    /* Input container fixed at bottom */
+    .input-wrapper {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 800px !important;
+        background-color: white !important;
+        z-index: 1000 !important;
+        padding: 1.5rem 2rem !important;
+        box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
     }
 
     [data-testid="stHorizontalBlock"]:has([data-testid="stChatInput"]) {
         position: fixed !important;
         bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100% !important;
+        max-width: 800px !important;
         background-color: white !important;
         z-index: 1000 !important;
-        padding: 1rem !important;
-        border-top: 2px solid #e0e0e0 !important;
-        margin: 0 !important;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
-        max-width: 900px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+        padding: 1.5rem 2rem 2rem 2rem !important;
+        box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08) !important;
+        gap: 1rem !important;
     }
 
     [data-testid="stChatInput"] {
         margin: 0 !important;
-    }
-
-    [data-testid="stFileUploader"] {
-        margin: 0 !important;
-    }
-
-    [data-testid="stFileUploader"] section {
-        padding: 0.5rem !important;
-        border: 2px solid #999 !important;
-        border-radius: 8px !important;
+        flex: 1 !important;
     }
 
     [data-testid="stChatInput"] input {
-        background-color: transparent !important;
-        border: 2px solid #999 !important;
-        border-radius: 8px !important;
-        padding: 1rem 1.2rem !important;
-        font-size: 1.05rem !important;
+        background-color: #f9f9f9 !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 24px !important;
+        padding: 1rem 1.5rem !important;
+        font-size: 1rem !important;
         color: #333 !important;
-        box-shadow: none !important;
-    }
-
-    [data-testid="stChatInput"] input::placeholder {
-        color: #bbb !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s ease !important;
     }
 
     [data-testid="stChatInput"] input:focus {
         border-color: #667eea !important;
+        background-color: white !important;
         outline: none !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
+    }
+
+    /* File uploader styling */
+    [data-testid="stFileUploader"] {
+        margin: 0 !important;
+        min-width: 120px !important;
+    }
+
+    [data-testid="stFileUploader"] section {
+        padding: 0.5rem 1rem !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 20px !important;
+        background-color: #f9f9f9 !important;
+        transition: all 0.2s ease !important;
+    }
+
+    [data-testid="stFileUploader"] section:hover {
+        background-color: white !important;
+        border-color: #667eea !important;
+    }
+
+    [data-testid="stFileUploader"] button {
+        font-size: 0.9rem !important;
+        color: #666 !important;
+    }
+
+    [data-testid="stChatInput"] input::placeholder {
+        color: #999 !important;
     }
 
     [data-testid="stHorizontalBlock"] {
@@ -321,23 +350,22 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Input area - audio upload beside text input like ChatGPT
-    col1, col2 = st.columns([5, 1])
+    # Input area centered like Claude - audio upload and text input side by side
+    col1, col2 = st.columns([1, 4])
 
     with col1:
-        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
-
-    with col2:
         if st.session_state.voice_enabled:
             audio_file = st.file_uploader(
-                "🎤",
+                "🎤 Audio",
                 type=["wav", "mp3", "ogg", "m4a", "webm"],
                 key="audio_uploader",
-                help="Upload audio file",
-                label_visibility="collapsed"
+                help="Upload audio file to transcribe"
             )
         else:
             audio_file = None
+
+    with col2:
+        user_input = st.chat_input("How can I help you today?", key="text_input")
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
