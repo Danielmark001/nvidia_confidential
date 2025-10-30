@@ -345,7 +345,7 @@ with main_col:
         # Generate response
         with st.chat_message("assistant", avatar="💊"):
             try:
-                # Step 0: Extract medication names from question using LLM
+                # Step 0: Generate optimal search query using LLM
                 with st.spinner("Understanding your question..."):
                     from openai import OpenAI
 
@@ -359,7 +359,26 @@ with main_col:
                         messages=[
                             {
                                 "role": "system",
-                                "content": "You are a medication name extractor. Extract ONLY the medication names, drug names, or medical conditions mentioned in the user's question. Return them as a comma-separated list. If no specific medication is mentioned, return the key medical terms. Examples:\n- 'What is insulin?' -> 'insulin'\n- 'Tell me about metformin for diabetes' -> 'metformin, diabetes'\n- 'How does aspirin work?' -> 'aspirin'\n- 'What treats high blood pressure?' -> 'high blood pressure, hypertension'\nReturn ONLY the terms, no explanation."
+                                "content": """You are a search query generator for a medication database. Given a user's question, generate the optimal search terms that would find relevant medications in a fulltext search.
+
+Consider:
+- Medication names (e.g., "insulin", "metformin", "aspirin")
+- Medical conditions (e.g., "diabetes", "hypertension", "pain")
+- Drug classes (e.g., "antibiotics", "statins", "beta blockers")
+- Symptoms being treated (e.g., "high blood pressure", "fever", "inflammation")
+- Generic concepts (e.g., "blood sugar", "cholesterol")
+
+Return 2-5 relevant search terms separated by spaces. Choose terms that would match medication names, descriptions, or indications.
+
+Examples:
+- "What is insulin?" -> "insulin diabetes"
+- "Tell me about metformin" -> "metformin"
+- "What treats high blood pressure?" -> "hypertension blood pressure"
+- "I have diabetes, what are my options?" -> "diabetes glucose insulin"
+- "What's good for pain?" -> "pain analgesic"
+- "Alternatives to aspirin?" -> "aspirin antiplatelet"
+
+Return ONLY the search terms, no explanation."""
                             },
                             {
                                 "role": "user",
