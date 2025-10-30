@@ -297,16 +297,9 @@ with main_col:
         audio_file = None
         enable_tts = False
 
-    # Speech input button with audio visualizer
+    # Speech input button
     st.markdown("""
 <style>
-    .speech-container {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
     .speech-btn {
         background-color: transparent !important;
         color: #333 !important;
@@ -316,8 +309,6 @@ with main_col:
         font-size: 0.85rem !important;
         font-weight: 500 !important;
         cursor: pointer !important;
-        white-space: nowrap !important;
-        flex-shrink: 0 !important;
         box-shadow: none !important;
     }
 
@@ -326,50 +317,21 @@ with main_col:
         background-color: #f9f9f9 !important;
     }
 
-    .speech-btn:active {
-        border-color: #333 !important;
-        background-color: #f0f0f0 !important;
-    }
-
     .speech-btn.listening {
-        border-color: #333 !important;
         background-color: #f5f5f5 !important;
-    }
-
-    .audio-visualizer {
-        width: 150px;
-        height: 30px;
-        background-color: #f5f5f5;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #999;
-    }
-
-    #audioCanvas {
-        width: 100%;
-        height: 100%;
     }
 </style>
 
-<div class="speech-container">
-    <button id="speech-btn" class="speech-btn" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')">
-        🎤 Speak
-    </button>
-    <div class="audio-visualizer">
-        <canvas id="audioCanvas"></canvas>
-    </div>
-</div>
+<button id="speech-btn" class="speech-btn" onclick="window.startSpeech()">
+    🎤 Speak
+</button>
 
 <script>
 function initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        console.error('Speech Recognition not supported');
+        console.error('Speech Recognition not supported in this browser');
         return;
     }
 
@@ -378,71 +340,19 @@ function initSpeechRecognition() {
     window.recognition.interimResults = false;
     window.recognition.lang = 'en-US';
 
-    let audioContext;
-    let analyser;
-    let animationId;
-    const canvas = document.getElementById('audioCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function drawVisualizer(dataArray) {
-        const width = canvas.width;
-        const height = canvas.height;
-
-        ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.fillStyle = '#333';
-        const barWidth = width / dataArray.length;
-
-        for (let i = 0; i < dataArray.length; i++) {
-            const barHeight = (dataArray[i] / 255) * height;
-            ctx.fillRect(i * barWidth, height - barHeight, barWidth - 1, barHeight);
-        }
-    }
-
-    function animate(dataArray) {
-        drawVisualizer(dataArray);
-        animationId = requestAnimationFrame(() => animate(dataArray));
-    }
-
     window.startSpeech = function() {
-        try {
-            const btn = document.getElementById('speech-btn');
-            btn.classList.add('listening');
+        const btn = document.getElementById('speech-btn');
+        btn.classList.add('listening');
+        btn.textContent = '🎤 Listening...';
 
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256;
-            }
-
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    const source = audioContext.createMediaStreamSource(stream);
-                    source.connect(analyser);
-
-                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-                    function updateVisualizer() {
-                        analyser.getByteFrequencyData(dataArray);
-                        drawVisualizer(dataArray);
-                        animationId = requestAnimationFrame(updateVisualizer);
-                    }
-
-                    updateVisualizer();
-                    window.recognition.start();
-                })
-                .catch(err => {
-                    console.error('Microphone error:', err);
-                    btn.classList.remove('listening');
-                    alert('Microphone access denied');
-                });
-        } catch (error) {
-            console.error('Error starting speech:', error);
-        }
+        window.recognition.start();
     };
 
     window.recognition.onresult = function(event) {
+        const btn = document.getElementById('speech-btn');
+        btn.classList.remove('listening');
+        btn.textContent = '🎤 Speak';
+
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
             if (event.results[i].isFinal) {
@@ -451,13 +361,6 @@ function initSpeechRecognition() {
         }
 
         if (transcript) {
-            const btn = document.getElementById('speech-btn');
-            btn.classList.remove('listening');
-            cancelAnimationFrame(animationId);
-
-            ctx.fillStyle = '#f5f5f5';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             const inputs = document.querySelectorAll('input[type="text"]');
             const chatInput = Array.from(inputs).find(input =>
                 input.placeholder && input.placeholder.includes('medications')
@@ -475,24 +378,19 @@ function initSpeechRecognition() {
     window.recognition.onerror = function(event) {
         const btn = document.getElementById('speech-btn');
         btn.classList.remove('listening');
-        cancelAnimationFrame(animationId);
-        ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        console.error('Speech error:', event.error);
+        btn.textContent = '🎤 Speak';
+        console.error('Speech recognition error:', event.error);
     };
 
     window.recognition.onend = function() {
         const btn = document.getElementById('speech-btn');
         btn.classList.remove('listening');
-        cancelAnimationFrame(animationId);
-        ctx.fillStyle = '#f5f5f5';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        btn.textContent = '🎤 Speak';
     };
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSpeechRecognition);
-} else {
+document.addEventListener('DOMContentLoaded', initSpeechRecognition);
+if (document.readyState !== 'loading') {
     initSpeechRecognition();
 }
 </script>
