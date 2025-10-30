@@ -177,16 +177,14 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] button {
-        font-size: 1.1rem !important;
-        padding: 0.2rem 0.4rem !important;
+        font-size: 0.9rem !important;
+        padding: 0.4rem 0.8rem !important;
         background: transparent !important;
         border: none !important;
         opacity: 0.7 !important;
         transition: all 0.2s !important;
         cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.3rem !important;
+        color: #666 !important;
     }
 
     [data-testid="stFileUploader"] button:hover {
@@ -195,13 +193,12 @@ st.markdown("""
     }
 
     [data-testid="stFileUploader"] button span {
-        font-size: 0.85rem !important;
-        color: #666 !important;
+        display: block !important;
     }
 
     [data-testid="stFileUploader"] button::before {
-        content: "🎤" !important;
-        font-size: 1.1rem !important;
+        content: "" !important;
+        display: none !important;
     }
 
     [data-testid="stFileUploader"] label {
@@ -390,10 +387,11 @@ with main_col:
     # Audio upload (will be positioned to the left of text input with CSS)
     if st.session_state.voice_enabled:
         audio_file = st.file_uploader(
-            "Audio",
+            "Upload Audio",
             type=["wav", "mp3", "ogg", "m4a", "webm"],
             key="audio_uploader",
-            help="Upload audio file to transcribe"
+            help="Upload audio file to transcribe",
+            label_visibility="collapsed"
         )
     else:
         audio_file = None
