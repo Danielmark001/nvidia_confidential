@@ -86,12 +86,12 @@ st.markdown("""
     [data-testid="stChatInput"] {
         position: sticky;
         bottom: 0;
-        background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+        background: linear-gradient(135deg, #1f77b4 0%, #155a9c 100%);
         z-index: 100;
         padding: 1.5rem;
-        border-top: 2px solid #1f77b4;
+        border-top: 3px solid #0f3f6b;
         border-radius: 12px 12px 0 0;
-        box-shadow: 0 -4px 12px rgba(31, 119, 180, 0.15);
+        box-shadow: 0 -8px 24px rgba(31, 119, 180, 0.3);
         margin-top: 1rem;
     }
 
@@ -99,14 +99,59 @@ st.markdown("""
         background-color: white;
         border: 2px solid #1f77b4;
         border-radius: 8px;
-        padding: 0.75rem 1rem;
+        padding: 0.85rem 1.2rem;
         font-size: 0.95rem;
-        box-shadow: 0 2px 6px rgba(31, 119, 180, 0.1);
+        box-shadow: 0 4px 12px rgba(31, 119, 180, 0.2);
+        color: #333;
+    }
+
+    [data-testid="stChatInput"] input::placeholder {
+        color: #999;
     }
 
     [data-testid="stChatInput"] input:focus {
-        border-color: #1f77b4;
-        box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1), 0 2px 6px rgba(31, 119, 180, 0.15);
+        border-color: #0f3f6b;
+        box-shadow: 0 0 0 4px rgba(31, 119, 180, 0.2), 0 4px 12px rgba(31, 119, 180, 0.3);
+        outline: none;
+    }
+
+    .mic-button {
+        background-color: #ff4444;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mic-button:hover {
+        background-color: #ff2222;
+        box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+    }
+
+    .mic-button.listening {
+        background-color: #ff0000;
+        box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 0 8px rgba(255, 68, 68, 0.1);
+        }
+        100% {
+            box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.3);
+        }
     }
 
     [data-testid="stHorizontalBlock"] {
@@ -246,8 +291,9 @@ with main_col:
         st.markdown("""
         <div class="info-box">
             <strong>How to use:</strong><br>
-            • Type a question about medications<br>
-            • Or upload an audio file (if voice is enabled)<br>
+            • Type a question about medications in the input box<br>
+            • Or click the "Speak Now" button to ask directly by voice<br>
+            • Upload an audio file for transcription (if voice is enabled)<br>
             • Get answers from our knowledge graph of 15,236+ medications
         </div>
         """, unsafe_allow_html=True)
@@ -290,6 +336,58 @@ with main_col:
 
         # Text input - prominently displayed
         user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+
+        # Speech input button
+        st.markdown("""
+        <script>
+            // Web Speech API for direct speech input
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                window.recognition = new SpeechRecognition();
+                window.recognition.continuous = false;
+                window.recognition.interimResults = true;
+                window.recognition.lang = 'en-US';
+
+                window.startSpeech = function() {
+                    const btn = document.getElementById('speech-btn');
+                    btn.classList.add('listening');
+                    btn.innerText = '🎤 Listening...';
+                    window.recognition.start();
+                };
+
+                window.recognition.onresult = function(event) {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+
+                    if (event.results[event.results.length - 1].isFinal) {
+                        const btn = document.getElementById('speech-btn');
+                        btn.classList.remove('listening');
+                        btn.innerText = '🎤 Speak Now';
+
+                        // Set the input field value and trigger change
+                        const input = document.querySelector('[data-testid="stChatInput"] input');
+                        if (input) {
+                            input.value = transcript;
+                            input.dispatchEvent(new Event('input', { bubbles: true }));
+                            setTimeout(() => input.focus(), 100);
+                        }
+                    }
+                };
+
+                window.recognition.onerror = function(event) {
+                    const btn = document.getElementById('speech-btn');
+                    btn.classList.remove('listening');
+                    btn.innerText = '🎤 Speak Now';
+                    console.error('Speech error:', event.error);
+                };
+            }
+        </script>
+        <button id="speech-btn" class="mic-button" onclick="window.startSpeech()" style="margin-top: 0.5rem; width: 100%;">
+            🎤 Speak Now
+        </button>
+        """, unsafe_allow_html=True)
 
     # Process audio input
     if st.session_state.voice_enabled and audio_file is not None:
