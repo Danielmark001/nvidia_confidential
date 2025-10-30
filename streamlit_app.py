@@ -135,22 +135,23 @@ st.markdown("""
 
     [data-testid="stChatInput"] input {
         background-color: white !important;
-        border: 3px solid #b8c0e0 !important;
-        border-radius: 32px !important;
-        padding: 1.4rem 2rem !important;
-        font-size: 1.15rem !important;
-        color: #1a1a1a !important;
-        font-weight: 500 !important;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12) !important;
+        border: 4px solid #8b95d3 !important;
+        border-radius: 40px !important;
+        padding: 1.6rem 2.5rem !important;
+        font-size: 1.25rem !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
         transition: all 0.3s ease !important;
+        min-height: 60px !important;
     }
 
     [data-testid="stChatInput"] input:focus {
         border-color: #667eea !important;
         background-color: white !important;
         outline: none !important;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3) !important;
-        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35) !important;
+        transform: translateY(-3px) !important;
     }
 
     /* File uploader styling - compact and user-friendly */
@@ -214,13 +215,22 @@ st.markdown("""
         display: none !important;
     }
 
-    /* Hide drag and drop text */
+    /* Style drag and drop text to be white */
     [data-testid="stFileUploader"] small {
-        display: none !important;
+        color: #ffffff !important;
+        font-size: 0.8rem !important;
     }
 
     [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] {
-        display: none !important;
+        color: #ffffff !important;
+    }
+
+    [data-testid="stFileUploader"] p {
+        color: #ffffff !important;
+    }
+
+    [data-testid="stFileUploader"] div {
+        color: #ffffff !important;
     }
 
     [data-testid="stChatInput"] input::placeholder {
