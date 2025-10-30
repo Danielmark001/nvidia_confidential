@@ -300,11 +300,14 @@ with main_col:
     with st.container():
         st.divider()
 
-        # Voice settings and audio upload
-        if st.session_state.voice_enabled:
-            voice_col1, voice_col2, voice_col3 = st.columns([2, 1, 1])
+        # Text input - prominently displayed
+        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
 
-            with voice_col1:
+        # Voice options row
+        voice_col1, voice_col2, voice_col3 = st.columns([2, 1, 1])
+
+        with voice_col1:
+            if st.session_state.voice_enabled:
                 audio_file = st.file_uploader(
                     "Upload audio",
                     type=["wav", "mp3", "ogg", "m4a", "webm"],
@@ -312,18 +315,17 @@ with main_col:
                     label_visibility="collapsed",
                     help="Upload an audio file to transcribe and ask"
                 )
+            else:
+                audio_file = None
 
-            with voice_col2:
+        with voice_col2:
+            if st.session_state.voice_enabled:
                 enable_tts = st.checkbox("Voice reply", value=True, help="Get voice responses")
+            else:
+                enable_tts = False
 
-            with voice_col3:
-                st.empty()
-        else:
-            audio_file = None
-            enable_tts = False
-
-        # Text input - prominently displayed
-        user_input = st.chat_input("Ask about medications or follow up with more questions...", key="text_input")
+        with voice_col3:
+            st.empty()
 
         # Speech input button
         st.markdown("""
@@ -400,7 +402,7 @@ with main_col:
                 initSpeechRecognition();
             }
         </script>
-        <button id="speech-btn" class="mic-button" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')">
+        <button id="speech-btn" class="mic-button" onclick="window.startSpeech ? window.startSpeech() : alert('Speech recognition not ready')" style="width: 100%; margin-top: 0.5rem;">
             🎤 Speak Now
         </button>
         """, unsafe_allow_html=True)
