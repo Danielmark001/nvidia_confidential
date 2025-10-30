@@ -12,10 +12,8 @@ load_dotenv()
 
 def get_secret(key: str, default: str = "") -> str:
     try:
-        secret_val = st.secrets.get(key)
-        if secret_val:
-            return secret_val
-    except (FileNotFoundError, AttributeError):
+        return st.secrets[key]
+    except:
         pass
 
     env_val = os.getenv(key)
