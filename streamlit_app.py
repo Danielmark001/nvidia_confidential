@@ -104,10 +104,10 @@ st.markdown("""
 
     [data-testid="stChatInput"] input {
         background-color: transparent !important;
-        border: 1px solid #999 !important;
-        border-radius: 4px !important;
-        padding: 0.6rem 0.8rem !important;
-        font-size: 0.95rem !important;
+        border: 2px solid #999 !important;
+        border-radius: 8px !important;
+        padding: 1rem 1.2rem !important;
+        font-size: 1.05rem !important;
         color: #333 !important;
         box-shadow: none !important;
     }
@@ -117,9 +117,9 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] input:focus {
-        border-color: #333 !important;
+        border-color: #667eea !important;
         outline: none !important;
-        box-shadow: none !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
     }
 
     [data-testid="stHorizontalBlock"] {
@@ -307,13 +307,13 @@ with main_col:
         color: white !important;
         border: none !important;
         border-radius: 8px !important;
-        padding: 0.75rem 1.5rem !important;
-        font-size: 0.95rem !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.9rem !important;
         font-weight: 600 !important;
         cursor: pointer !important;
         box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3) !important;
         transition: all 0.3s ease !important;
-        width: 100%;
+        display: inline-block;
         margin: 0.5rem 0;
     }
 
