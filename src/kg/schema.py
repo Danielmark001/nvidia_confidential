@@ -19,6 +19,7 @@ class KnowledgeGraphSchema:
     - Schedule: Represents dosing schedule (frequency, timing)
     - Interaction: Represents drug-drug interactions
     - Advice: Represents clinical advice/instructions
+    - Source: Represents data source (DrugBank, clinical notes, etc.)
 
     Relationships:
     - (Patient)-[:HAS_DIAGNOSIS]->(Diagnosis)
@@ -28,6 +29,8 @@ class KnowledgeGraphSchema:
     - (Medication)-[:CONTRAINDICATES]->(Diagnosis)
     - (Patient)-[:RECEIVED_ADVICE]->(Advice)
     - (Advice)-[:ABOUT_MEDICATION]->(Medication)
+    - (Medication)-[:CITED_FROM]->(Source)
+    - (Diagnosis)-[:CITED_FROM]->(Source)
     """
 
     def __init__(self, uri: str = None, username: str = None, password: str = None):
@@ -86,6 +89,9 @@ class KnowledgeGraphSchema:
 
             # DrugBank ID constraint
             "CREATE CONSTRAINT drugbank_id_unique IF NOT EXISTS FOR (m:Medication) REQUIRE m.drugbank_id IS UNIQUE",
+
+            # Source constraints
+            "CREATE CONSTRAINT source_id_unique IF NOT EXISTS FOR (s:Source) REQUIRE s.source_id IS UNIQUE",
         ]
 
         with self.driver.session() as session:
@@ -110,6 +116,10 @@ class KnowledgeGraphSchema:
 
             # Schedule indexes
             "CREATE INDEX schedule_frequency_index IF NOT EXISTS FOR (s:Schedule) ON (s.frequency)",
+
+            # Source indexes
+            "CREATE INDEX source_id_index IF NOT EXISTS FOR (s:Source) ON (s.source_id)",
+            "CREATE INDEX source_type_index IF NOT EXISTS FOR (s:Source) ON (s.source_type)",
         ]
 
         with self.driver.session() as session:
@@ -243,6 +253,7 @@ Nodes:
   - Schedule: frequency, timing, instructions
   - Interaction: severity, description
   - Advice: text, category
+  - Source: source_id, source_type, url, title, last_updated
 
 Relationships:
   - (Patient)-[:HAS_DIAGNOSIS]->(Diagnosis)
@@ -252,7 +263,8 @@ Relationships:
   - (Medication)-[:CONTRAINDICATES]->(Diagnosis)
   - (Patient)-[:RECEIVED_ADVICE]->(Advice)
   - (Advice)-[:ABOUT_MEDICATION]->(Medication)
-  - (Medication)-[:DRUGBANK_INFO]->(DrugBankInfo)
+  - (Medication)-[:CITED_FROM]->(Source)
+  - (Diagnosis)-[:CITED_FROM]->(Source)
         """
         return schema_text
 

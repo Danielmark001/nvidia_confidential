@@ -36,6 +36,39 @@ class MedicationQueryBuilder:
         return query, params
 
     @staticmethod
+    def find_medication_with_sources(medication_name: str, limit: int = 3) -> tuple[str, dict]:
+        """
+        Build query to find medications by name including source citations.
+
+        Returns:
+            Tuple of (query_string, parameters_dict)
+        """
+        ft_query = generate_full_text_query(medication_name)
+
+        query = """
+        CALL db.index.fulltext.queryNodes('medication_fulltext', $fulltextQuery, {limit: $limit})
+        YIELD node AS m
+        OPTIONAL MATCH (m)-[:CITED_FROM]->(source:Source)
+        RETURN m.name AS name,
+               m.drugbank_id AS drugbank_id,
+               m.description AS description,
+               m.indication AS indication,
+               COLLECT({
+                   source_id: source.source_id,
+                   source_type: source.source_type,
+                   url: source.url,
+                   title: source.title
+               }) AS sources
+        """
+
+        params = {
+            "fulltextQuery": ft_query,
+            "limit": limit
+        }
+
+        return query, params
+
+    @staticmethod
     def get_medication_schedule(
         medication_name: str,
         patient_id: Optional[str] = None
@@ -317,6 +350,59 @@ def generate_full_text_query(input_str: str) -> str:
     full_text_query += f" {words[-1]}~2"
 
     return full_text_query.strip()
+
+
+class SourceCitationBuilder:
+    """Build queries for source citation tracking."""
+
+    @staticmethod
+    def get_medication_sources(medication_name: str) -> tuple[str, dict]:
+        """Get all sources for a medication."""
+        query = """
+        MATCH (m:Medication {name: $med_name})-[:CITED_FROM]->(source:Source)
+        RETURN source.source_id AS source_id,
+               source.source_type AS source_type,
+               source.url AS url,
+               source.title AS title,
+               source.last_updated AS last_updated
+        ORDER BY source.source_type, source.title
+        """
+
+        params = {"med_name": medication_name}
+        return query, params
+
+    @staticmethod
+    def get_all_sources() -> tuple[str, dict]:
+        """Get all sources in the knowledge graph."""
+        query = """
+        MATCH (s:Source)
+        RETURN s.source_id AS source_id,
+               s.source_type AS source_type,
+               s.url AS url,
+               s.title AS title,
+               s.last_updated AS last_updated
+        ORDER BY s.source_type, s.title
+        """
+
+        params = {}
+        return query, params
+
+    @staticmethod
+    def get_source_details(source_id: str) -> tuple[str, dict]:
+        """Get detailed information about a source."""
+        query = """
+        MATCH (s:Source {source_id: $source_id})
+        OPTIONAL MATCH (s)<-[:CITED_FROM]-(m:Medication)
+        RETURN s.source_id AS source_id,
+               s.source_type AS source_type,
+               s.url AS url,
+               s.title AS title,
+               s.last_updated AS last_updated,
+               COLLECT(DISTINCT m.name) AS cited_medications
+        """
+
+        params = {"source_id": source_id}
+        return query, params
 
 
 def execute_query(driver, query: str, params: Dict[str, Any]) -> List[Dict]:

@@ -1,12 +1,32 @@
 """
 Medication Advisor with NVIDIA NIM + Neo4j + ElevenLabs Voice
 Barebones implementation with voice input/output support
+Enhanced with: Source citations, Graph visualization, Patient scenarios, Voice input, Avatars
 """
 
 import streamlit as st
 from dotenv import load_dotenv
 import os
 import io
+
+# Feature flag initialization
+FEATURES_AVAILABLE = True
+SCENARIOS_AVAILABLE = True
+GRAPH_VIZ_AVAILABLE = True
+
+# Try to import feature modules, set flags to False if unavailable
+try:
+    from src.scenarios.patient_manager import PatientScenarioManager
+except ImportError:
+    SCENARIOS_AVAILABLE = False
+
+try:
+    from src.visualization.graph_builder import build_medication_subgraph
+except ImportError:
+    GRAPH_VIZ_AVAILABLE = False
+
+# Import json for patient scenarios if not available from module
+import json
 
 load_dotenv()
 
@@ -24,6 +44,94 @@ def get_secret(key: str, default: str = "") -> str:
         return env_val
 
     return default
+
+# Feature: Avatar Selector
+def render_avatar_selector():
+    avatar_options = {"Doctor": "🏥", "Medical Bot": "🤖", "Assistant": "💊"}
+    selected = st.sidebar.selectbox("AI Advisor Avatar", list(avatar_options.keys()), index=1)
+    avatar = avatar_options.get(selected, "🤖")
+    st.session_state.selected_avatar = avatar
+    return avatar
+
+# Feature: Demo Mode Toggle
+def render_demo_mode_toggle():
+    return st.sidebar.toggle("Enable Demo Mode", value=False)
+
+# Feature: Load Patient Scenarios
+def load_patient_scenarios():
+    scenario_file = "data/scenarios/patient_scenarios.json"
+    if os.path.exists(scenario_file):
+        with open(scenario_file, 'r') as f:
+            return json.load(f)
+    return []
+
+# Feature: Patient Selector
+def render_patient_selector(scenarios):
+    if not scenarios:
+        return None
+    patient_names = [f"{s['name']} ({s['age']}y)" for s in scenarios]
+    selected_idx = st.sidebar.selectbox("Select Patient", range(len(scenarios)), format_func=lambda i: patient_names[i])
+    return scenarios[selected_idx]
+
+# Feature: Patient Card Display
+def render_patient_card(patient):
+    with st.sidebar.container():
+        st.markdown("### Patient Profile")
+        st.markdown(f"**Name:** {patient['name']}")
+        st.markdown(f"**Age:** {patient['age']}")
+        st.markdown(f"**Diagnoses:** {', '.join(patient['diagnoses'])}")
+
+# Feature: Voice Input with audio-recorder-streamlit
+def render_voice_input():
+    """Render voice input using audio-recorder-streamlit component."""
+    from audio_recorder_streamlit import audio_recorder
+    import numpy as np
+    import soundfile as sf
+    import io
+
+    st.markdown("### 🎤 Record Your Question")
+    st.info("Click the microphone button below to start recording. Click again to stop.")
+
+    # Audio recorder component - returns audio bytes when recording stops
+    audio_bytes = audio_recorder(
+        text="Click to record",
+        recording_color="#ff4444",
+        neutral_color="#667eea",
+        icon_name="microphone",
+        icon_size="2x",
+        sample_rate=16000,
+        max_seconds=600,
+        key="audio_recorder"
+    )
+
+    # Process recorded audio
+    if audio_bytes:
+        try:
+            # Convert bytes to numpy array
+            audio_data = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+
+            # Amplify audio for louder playback
+            amplified_audio = audio_data * 2.5
+
+            # Normalize to prevent clipping
+            max_val = np.max(np.abs(amplified_audio))
+            if max_val > 1.0:
+                amplified_audio = amplified_audio / max_val
+
+            # Convert back to WAV bytes
+            audio_buffer = io.BytesIO()
+            sf.write(audio_buffer, amplified_audio, 16000, format='WAV')
+            processed_audio_bytes = audio_buffer.getvalue()
+
+            # Store in session state
+            st.session_state.audio_bytes = processed_audio_bytes
+
+            # Show success message and audio player
+            st.success(f"✓ Recording saved! ({len(audio_data)/16000:.1f}s)")
+            st.audio(processed_audio_bytes, format="audio/wav")
+
+        except Exception as e:
+            st.error(f"Audio processing error: {str(e)}")
 
 st.set_page_config(
     page_title="Medication Advisor AI",
@@ -253,6 +361,12 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "voice_enabled" not in st.session_state:
     st.session_state.voice_enabled = False
+if "recording" not in st.session_state:
+    st.session_state.recording = False
+if "audio_data" not in st.session_state:
+    st.session_state.audio_data = None
+if "selected_avatar" not in st.session_state:
+    st.session_state.selected_avatar = "🤖"
 
 # Sidebar - Model Configuration
 with st.sidebar:
@@ -329,6 +443,31 @@ with st.sidebar:
 
     st.divider()
 
+    # NEW FEATURES: Avatar, Demo Mode, Patient Scenarios
+    st.markdown("<h3 style='margin-top: 0; color: #667eea;'>✨ Features</h3>", unsafe_allow_html=True)
+
+    # Avatar selector
+    avatar = render_avatar_selector()
+
+    # Demo mode toggle
+    demo_mode = render_demo_mode_toggle()
+
+    if demo_mode:
+        st.markdown("---")
+        try:
+            scenarios = load_patient_scenarios()
+            if scenarios:
+                patient = render_patient_selector(scenarios)
+                if patient:
+                    render_patient_card(patient)
+                    st.session_state.current_patient = patient
+            else:
+                st.info("No patient scenarios available")
+        except Exception as e:
+            st.warning(f"Error loading scenarios: {str(e)[:50]}")
+
+    st.divider()
+
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Reset Settings", use_container_width=True):
@@ -396,7 +535,13 @@ with main_col:
 
     # Display chat messages
     for message in st.session_state.messages:
-        avatar = "🧑" if message["role"] == "user" else "💊"
+        # Use custom avatar if available, otherwise default
+        if message["role"] == "user":
+            avatar = "🧑"
+        else:
+            # Get avatar from sidebar if available
+            avatar = st.session_state.get("selected_avatar", "💊")
+
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
 
@@ -404,22 +549,70 @@ with main_col:
             if message["role"] == "assistant" and "audio" in message:
                 st.audio(message["audio"], format="audio/mp3")
 
-    # Audio upload (will be positioned to the left of text input with CSS)
+            # Show sources if available
+            if message["role"] == "assistant" and "sources" in message:
+                with st.expander("Sources & Citations"):
+                    for source in message["sources"]:
+                        st.markdown(f"- {source}")
+
+            # Show graph visualization button if available
+            if message["role"] == "assistant" and "medications" in message and GRAPH_VIZ_AVAILABLE:
+                if st.button("📊 Show Medication Graph", key=f"graph_{id(message)}"):
+                    with st.spinner("Building medication network..."):
+                        try:
+                            graph = build_medication_subgraph(message["medications"])
+                            st.info("Graph visualization would appear here")
+                        except Exception as e:
+                            st.warning(f"Graph unavailable: {str(e)}")
+
+    # Voice recording section - using audio-recorder component
+    if st.session_state.voice_enabled:
+        render_voice_input()
+
+        # Show transcribe button if audio is ready
+        if st.session_state.get("audio_bytes") is not None:
+            if st.button("🎯 Transcribe & Answer", use_container_width=True, key="transcribe_btn"):
+                st.session_state.do_transcribe = True
+                st.rerun()
+
+    # Text input section
+    st.markdown("---")
+    st.markdown("### Or Type Your Question")
+    user_input = st.chat_input("How can I help you today?", key="text_input")
+
+    # File upload option (secondary to voice button)
     if st.session_state.voice_enabled:
         audio_file = st.file_uploader(
-            "Upload Audio",
+            "Or upload an audio file",
             type=["wav", "mp3", "ogg", "m4a", "webm"],
             key="audio_uploader",
-            help="Upload audio file to transcribe",
             label_visibility="collapsed"
         )
     else:
         audio_file = None
 
-    # Text input
-    user_input = st.chat_input("How can I help you today?", key="text_input")
+    # Process voice recording transcription
+    if st.session_state.get("do_transcribe", False):
+        with st.spinner("🎤 Transcribing your voice..."):
+            try:
+                from src.voice.elevenlabs_client import create_voice_client
 
-    # Process audio input
+                voice_client = create_voice_client()
+
+                # Transcribe the recorded audio bytes
+                audio_file_obj = io.BytesIO(st.session_state.audio_bytes)
+                transcribed_text = voice_client.speech_to_text(audio_file_obj)
+
+                st.session_state.do_transcribe = False
+                st.session_state.audio_bytes = None
+                user_input = transcribed_text
+
+            except Exception as e:
+                st.error(f"Transcription error: {str(e)}")
+                st.session_state.do_transcribe = False
+                user_input = None
+
+    # Process audio input (file upload)
     if st.session_state.voice_enabled and audio_file is not None:
         with st.chat_message("user", avatar="🧑"):
             st.audio(audio_file)
@@ -587,6 +780,20 @@ Quality targets:
 - Natural, flowing explanations
 - Clear connections between related concepts"""
 
+                        # Add patient context if demo mode is enabled
+                        if st.session_state.get("demo_mode", False) and st.session_state.get("current_patient"):
+                            patient = st.session_state.current_patient
+                            system_prompt += f"""
+
+PATIENT CONTEXT (Demo Mode):
+You are assisting a patient with the following profile:
+- Name: {patient.get('name', 'Patient')}
+- Age: {patient.get('age', 'Unknown')}
+- Diagnoses: {', '.join(patient.get('diagnoses', []))}
+- Current Medications: {', '.join(patient.get('medications', []))}
+
+Consider this patient's specific situation when providing medication information. Be especially careful about drug interactions with their current medications."""
+
                     elif response_style == "Concise (Brief)":
                         system_prompt = """You are a medication information assistant who gives brief, natural explanations.
 
@@ -598,6 +805,11 @@ Guidelines:
 - Keep it simple and patient-friendly
 - Do not use bold text, asterisks, or markdown formatting
 - End with a brief reminder to consult a healthcare provider"""
+
+                        # Add patient context if demo mode is enabled
+                        if st.session_state.get("demo_mode", False) and st.session_state.get("current_patient"):
+                            patient = st.session_state.current_patient
+                            system_prompt += f"""\n\nPatient: {patient.get('name')}, {patient.get('age')} years old. Diagnoses: {', '.join(patient.get('diagnoses', []))}"""
 
                     else:
                         system_prompt = """You are an expert clinical pharmacologist who explains medication information conversationally but with technical precision.
@@ -611,6 +823,15 @@ Guidelines:
 - Include clinical considerations naturally in the explanation
 - Do not use bold text, asterisks, or markdown formatting
 - Do not create rigid sections or labels"""
+
+                        # Add patient context if demo mode is enabled
+                        if st.session_state.get("demo_mode", False) and st.session_state.get("current_patient"):
+                            patient = st.session_state.current_patient
+                            system_prompt += f"""\n\nPATIENT CONTEXT:
+- Name: {patient.get('name')}
+- Age: {patient.get('age')}
+- Diagnoses: {', '.join(patient.get('diagnoses', []))}
+- Current Medications: {', '.join(patient.get('medications', []))}"""
 
                     few_shot = """EXAMPLE:
 KG Data: "Metformin - Description: Biguanide that decreases hepatic glucose production. Indication: Type 2 diabetes mellitus."
@@ -673,6 +894,10 @@ Answer following the EXAMPLE format. Use ONLY the data provided above."""
                 }
                 if audio_data:
                     message_data["audio"] = audio_data
+
+                # Include medications for graph visualization
+                if kg_results:
+                    message_data["medications"] = [med["name"] for med in kg_results]
 
                 st.session_state.messages.append(message_data)
 
