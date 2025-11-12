@@ -1,71 +1,51 @@
 """Reusable UI components for the Streamlit app."""
 
 import streamlit as st
-from typing import Dict, List, Tuple, Optional
-import os
+from typing import Dict, List, Optional
+import json
+import io
 
 
 def render_avatar_selector():
     """Render avatar selection in sidebar."""
-    st.sidebar.markdown("### Avatar Settings")
-
-    avatar_options = {
-        "Doctor": "🏥",
-        "Medical Bot": "🤖",
-        "Assistant": "💊"
-    }
-
-    selected_avatar = st.sidebar.selectbox(
-        "AI Advisor Avatar",
-        options=list(avatar_options.keys()),
-        index=1
-    )
-
-    return avatar_options.get(selected_avatar, "🤖")
+    avatar_options = {"Doctor": "🏥", "Medical Bot": "🤖", "Assistant": "💊"}
+    selected = st.sidebar.selectbox("AI Advisor Avatar", list(avatar_options.keys()), index=1)
+    avatar = avatar_options.get(selected, "🤖")
+    st.session_state.selected_avatar = avatar
+    return avatar
 
 
 def render_demo_mode_toggle():
     """Render demo mode toggle in sidebar."""
-    st.sidebar.markdown("### Demo Mode")
-
-    demo_mode = st.sidebar.toggle("Enable Demo Mode", value=False)
-
-    return demo_mode
+    return st.sidebar.toggle("Enable Demo Mode", value=False)
 
 
-def render_patient_selector(patient_scenarios: List[Dict]) -> Optional[Dict]:
+def load_patient_scenarios():
+    """Load patient scenarios from JSON file."""
+    import os
+    scenario_file = "data/scenarios/patient_scenarios.json"
+    if os.path.exists(scenario_file):
+        with open(scenario_file, 'r') as f:
+            return json.load(f)
+    return []
+
+
+def render_patient_selector(scenarios):
     """Render patient scenario selector."""
-    if not patient_scenarios:
-        st.warning("No patient scenarios available")
+    if not scenarios:
         return None
-
-    st.sidebar.markdown("### Patient Scenario")
-
-    patient_names = [f"{s['name']} ({s['age']}y)" for s in patient_scenarios]
-
-    selected_idx = st.sidebar.selectbox(
-        "Select Patient",
-        range(len(patient_scenarios)),
-        format_func=lambda i: patient_names[i]
-    )
-
-    return patient_scenarios[selected_idx]
+    patient_names = [f"{s['name']} ({s['age']}y)" for s in scenarios]
+    selected_idx = st.sidebar.selectbox("Select Patient", range(len(scenarios)), format_func=lambda i: patient_names[i])
+    return scenarios[selected_idx]
 
 
-def render_patient_card(patient: Dict):
+def render_patient_card(patient):
     """Render patient information card."""
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("Patient Name", patient.get("name", "Unknown"))
-
-    with col2:
-        st.metric("Age", patient.get("age", "N/A"))
-
-    with col3:
-        st.metric("Situation", "Discharged" if patient.get("discharge_date") else "Admitted")
-
-    st.info(f"**Clinical Context:** {patient.get('context', 'N/A')}")
+    with st.sidebar.container():
+        st.markdown("### Patient Profile")
+        st.markdown(f"**Name:** {patient['name']}")
+        st.markdown(f"**Age:** {patient['age']}")
+        st.markdown(f"**Diagnoses:** {', '.join(patient['diagnoses'])}")
 
 
 def render_medications_list(medications: List[Dict]):
@@ -132,21 +112,45 @@ def render_graph_visualization(nodes: List[Dict], edges: List[Dict], height: int
 
 
 def render_voice_input():
-    """Render voice input component using file upload."""
-    st.info("📁 Upload an audio file or use the file uploader below to ask by voice")
+    """Render voice input using audio-recorder-streamlit component."""
+    try:
+        from audio_recorder_streamlit import audio_recorder
+        import numpy as np
+        import soundfile as sf
 
-    audio_file = st.file_uploader(
-        "Choose an audio file",
-        type=["wav", "mp3", "ogg", "m4a", "webm"],
-        key="voice_file_uploader",
-        label_visibility="collapsed"
-    )
+        st.markdown("### 🎤 Record Your Question")
+        st.info("Click the microphone button below to start recording. Click again to stop.")
 
-    if audio_file:
-        st.audio(audio_file, format="audio/wav")
-        return audio_file
+        audio_bytes = audio_recorder(
+            text="Click to record",
+            recording_color="#ff4444",
+            neutral_color="#667eea",
+            icon_name="microphone",
+            icon_size="2x",
+            key="audio_recorder"
+        )
 
-    return None
+        if audio_bytes:
+            try:
+                # Don't process the audio - use it directly for better quality
+                # Store raw audio bytes for transcription
+                st.session_state.audio_bytes = audio_bytes
+
+                # Calculate duration for display
+                audio_data = np.frombuffer(audio_bytes, dtype=np.int16)
+                # audio-recorder-streamlit uses 44100 Hz sample rate
+                duration = len(audio_data) / 44100.0
+
+                st.success(f"✓ Recording saved! ({duration:.1f}s)")
+                st.audio(audio_bytes, format="audio/wav")
+
+            except Exception as e:
+                st.error(f"Audio processing error: {str(e)}")
+
+    except ImportError:
+        st.warning("Voice recording feature requires audio-recorder-streamlit package")
+    except Exception as e:
+        st.error(f"Voice input error: {str(e)}")
 
 
 def render_lottie_animation(animation_url: str, height: int = 200):
